@@ -3615,12 +3615,24 @@
 		(uuid "29c9be75-9b2c-4e25-aa3b-da0eaef3c03f")
 	)
 	(no_connect
+		(at 72.39 69.85)
+		(uuid "349901a7-d0c8-4578-8a78-61ba80dbe02f")
+	)
+	(no_connect
+		(at 102.87 77.47)
+		(uuid "36e23196-0430-49e7-a0db-f585abd07e36")
+	)
+	(no_connect
 		(at 72.39 67.31)
 		(uuid "3d01ae37-b051-48e7-8c0e-85c69ae9a1c2")
 	)
 	(no_connect
 		(at 102.87 80.01)
 		(uuid "4a6c18c2-4014-492f-b891-ce6117e18799")
+	)
+	(no_connect
+		(at 102.87 74.93)
+		(uuid "67fb34e8-5f70-461f-9ccd-acc7407735bd")
 	)
 	(no_connect
 		(at 102.87 82.55)

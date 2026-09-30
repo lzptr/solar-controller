@@ -1,0 +1,44 @@
+# Temporary files
+*.000
+*.bak
+*.bck
+*.kicad_pcb-bak
+*.lck
+*.sch-bak
+*~
+_autosave-*
+*.tmp
+*-save.pro
+*-save.kicad_pcb
+*-cache.lib
+*-backups
+*#auto*
+
+fp-info-cache
+# Netlist files (exported from Eeschema)
+*.net
+# Autorouter files (exported from Pcbnew)
+*.dsn
+*.ses
+.storage
+.cache
+.cloud
+*.log*
+logs/
+log/
+*.pyc
+*Zone.Identifier
+*assets/*
+*.DS_Store
+
+# ESP-IDF generated files
+firmware/build/
+firmware/test/build/
+firmware/sdkconfig
+firmware/sdkconfig.old
+firmware/test/sdkconfig
+firmware/test/sdkconfig.old
+
+# ESP-IDF downloaded managed dependencies
+firmware/managed_components/
+firmware/test/managed_components/

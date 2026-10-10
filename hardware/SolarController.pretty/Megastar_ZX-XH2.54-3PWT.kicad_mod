@@ -17,4 +17,5 @@
  (fp_line (start -4.45 9.1) (end 4.45 9.1) (stroke (width 0.12) (type solid)) (layer "F.SilkS"))
  (fp_text user "1" (at -2.5 -2.5) (layer "F.SilkS") (effects (font (size 0.8 0.8) (thickness 0.12))))
  (fp_text user "CABLE ENTRY" (at 0 7.7) (layer "F.Fab") (effects (font (size 0.7 0.7) (thickness 0.1))))
+ (model "${KICAD_USER_3DMODEL_DIR}/Megastar_ZX-XH2.54-3PWT.step" (offset (xyz 0 -3.65 0.41)) (scale (xyz 1 1 1)) (rotate (xyz 0 0 0)))
 )

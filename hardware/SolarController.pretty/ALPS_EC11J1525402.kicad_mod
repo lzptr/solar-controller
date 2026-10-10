@@ -48,4 +48,5 @@
  (fp_line (start -3.45 9.2) (end 3.45 9.2) (stroke (width 0.12) (type solid)) (layer "F.SilkS"))
  (fp_text user "A" (at -2.5 9.25) (layer "F.SilkS") (effects (font (size 0.8 0.8) (thickness 0.12))))
  (fp_text user "KEEP COPPER / PASTE OUT OF SHADED CONTACT AREAS" (at 0 12.3) (layer "Dwgs.User") (effects (font (size 0.7 0.7) (thickness 0.1))))
+ (model "${KICAD_USER_3DMODEL_DIR}/ALPS_EC11J1525402.step" (offset (xyz 0 0 0)) (scale (xyz 1 1 1)) (rotate (xyz 0 0 0)))
 )

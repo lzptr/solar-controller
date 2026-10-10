@@ -42,3 +42,5 @@ firmware/test/sdkconfig.old
 # ESP-IDF downloaded managed dependencies
 firmware/managed_components/
 firmware/test/managed_components/
+
+output/**

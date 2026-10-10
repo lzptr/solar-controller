@@ -23,6 +23,16 @@
 	)
 	(wire
 		(pts
+			(xy 139.7 62.23) (xy 162.56 62.23)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6c484637-b9c3-467c-bb71-35eddbe96982")
+	)
+	(wire
+		(pts
 			(xy 139.7 59.69) (xy 162.56 59.69)
 		)
 		(stroke
@@ -175,16 +185,6 @@
 				(justify right)
 			)
 		)
-		(pin "LED_DATA" output
-			(at 139.7 49.53 0)
-			(uuid "af86f3ab-bc0a-48ce-ac24-25a7a14255a3")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
 		(pin "LED_FAULT_N" input
 			(at 139.7 52.07 0)
 			(uuid "bd9d1fcf-1d58-4d51-9bdc-ffe1d795c65a")
@@ -218,6 +218,26 @@
 		(pin "ENC_SW_N" input
 			(at 139.7 59.69 0)
 			(uuid "4e5c64cb-f21a-49f1-b0f4-67af556a3a54")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "LED_ISENSE" input
+			(at 139.7 62.23 0)
+			(uuid "6853f8b4-c76d-49f8-b870-b7e0e7108032")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "MCU_LDATA" output
+			(at 139.7 49.53 0)
+			(uuid "ce46170f-4fae-48e4-81ef-b81157e7806f")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -281,16 +301,6 @@
 				(justify left)
 			)
 		)
-		(pin "LED_DATA" input
-			(at 162.56 49.53 180)
-			(uuid "7f25da7b-7e7d-4355-bccd-ec354c6f4bbf")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
 		(pin "LED_FAULT_N" output
 			(at 162.56 52.07 180)
 			(uuid "0d143e96-a265-4d75-b1c0-dd7b8459ff17")
@@ -324,6 +334,26 @@
 		(pin "ENC_SW_N" output
 			(at 162.56 59.69 180)
 			(uuid "ddd705f0-571c-4297-8596-b78e97736672")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "LED_ISENSE" output
+			(at 162.56 62.23 180)
+			(uuid "c20bb77c-4218-4aa5-896d-f265d046dc82")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "MCU_LDATA" input
+			(at 162.56 49.53 180)
+			(uuid "bd2241ae-a8d0-40b0-8224-ad01ea90fcb5")
 			(effects
 				(font
 					(size 1.27 1.27)

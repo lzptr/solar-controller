@@ -1424,7 +1424,7 @@
 		)
 		(uuid "3a7b4fa6-7355-4787-b917-9c54b99c50ab")
 	)
-	(text "Note:  C302 is marked NRND, \n       but 2M parts still at basic price at jlc"
+	(text "Note:  C206 is marked NRND, \n       but 2M parts still at basic price at jlc"
 		(exclude_from_sim no)
 		(at 117.602 93.218 0)
 		(effects
@@ -1446,7 +1446,7 @@
 		)
 		(uuid "8a8dad97-a1b3-4cef-903d-2ef096f8e1c8")
 	)
-	(text "R301 / R302: Basic 1% parts.\nVOUT = 0.6 x (1 + 100k / 22k) = 3.327 V nominal."
+	(text "R208 / R209: Basic 1% parts.\nVOUT = 0.6 x (1 + 100k / 22k) = 3.327 V nominal."
 		(exclude_from_sim no)
 		(at 99.06 106.68 0)
 		(effects

@@ -1,0 +1,4 @@
+(sym_lib_table
+ (version 7)
+ (lib (name "SolarController")(type "KiCad")(uri "${KIPRJMOD}/SolarController.kicad_sym")(options "")(descr "Solar controller project symbols"))
+)

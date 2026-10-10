@@ -5,10 +5,82 @@
 	(uuid "1ebd2a79-85df-49b0-bc4d-96f69f4cf347")
 	(paper "A4")
 	(title_block
+		(title "LED power and controls")
 		(rev "1")
-		(comment 1 "Design for JLCPCB Service")
+		(comment 1 "JLCPCB")
 	)
 	(lib_symbols)
+	(text "LED power: dedicated USB-C 5 V / 3 A source required.\nCurrent-managed 70-pixel RGBW chain, rotary encoder and hardware OFF."
+		(exclude_from_sim no)
+		(at 48.26 124.46 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left top)
+		)
+		(uuid "ce946fcb-5cd8-4766-a029-006afeeb0755")
+	)
+	(wire
+		(pts
+			(xy 139.7 59.69) (xy 162.56 59.69)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8dbd3478-9a51-4231-bed9-82c5747f1995")
+	)
+	(wire
+		(pts
+			(xy 139.7 46.99) (xy 162.56 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a5d9d6fb-bcbb-4070-acee-84d140de5379")
+	)
+	(wire
+		(pts
+			(xy 139.7 49.53) (xy 162.56 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b16240d3-fb5e-40bb-8bda-fab693eca72a")
+	)
+	(wire
+		(pts
+			(xy 139.7 54.61) (xy 162.56 54.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "da8cee50-ef8d-4984-942d-081e0caaa592")
+	)
+	(wire
+		(pts
+			(xy 139.7 57.15) (xy 162.56 57.15)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e331d30b-6d9c-49d8-a58e-3ef8b311208d")
+	)
+	(wire
+		(pts
+			(xy 139.7 52.07) (xy 162.56 52.07)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e575c116-f1ab-4815-9e27-e7876d586eef")
+	)
 	(sheet
 		(at 48.26 41.91)
 		(size 31.75 13.97)
@@ -25,7 +97,7 @@
 			(color 0 0 0 0)
 		)
 		(uuid "60d9d9f3-ef40-41c3-9178-d3763959339b")
-		(property "Sheetname" "[1] Power"
+		(property "Sheetname" "[2] Power"
 			(at 48.26 41.1984 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -71,7 +143,7 @@
 			(color 0 0 0 0)
 		)
 		(uuid "79d4efb6-63ee-4f28-a804-ad9340df499b")
-		(property "Sheetname" "[2] MCU"
+		(property "Sheetname" "[3] MCU"
 			(at 97.79 41.1984 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -93,10 +165,176 @@
 				(justify left top)
 			)
 		)
+		(pin "LED_PWR_EN" output
+			(at 139.7 46.99 0)
+			(uuid "459836e1-6faf-4211-b1be-94ceb82d413f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "LED_DATA" output
+			(at 139.7 49.53 0)
+			(uuid "af86f3ab-bc0a-48ce-ac24-25a7a14255a3")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "LED_FAULT_N" input
+			(at 139.7 52.07 0)
+			(uuid "bd9d1fcf-1d58-4d51-9bdc-ffe1d795c65a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "ENC_A" input
+			(at 139.7 54.61 0)
+			(uuid "34e94fc4-7e9d-49b6-871d-e85ad05d4909")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "ENC_B" input
+			(at 139.7 57.15 0)
+			(uuid "0bc02339-f503-4290-b67a-df6ae96228c3")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "ENC_SW_N" input
+			(at 139.7 59.69 0)
+			(uuid "4e5c64cb-f21a-49f1-b0f4-67af556a3a54")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347"
 					(page "3")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 162.56 41.91)
+		(size 66.04 27.94)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "cdce0463-b38f-45a9-ac0b-2f95d4c8e617")
+		(property "Sheetname" "[4] LED control"
+			(at 162.56 41.1984 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "led-control.kicad_sch"
+			(at 162.56 70.4346 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "LED_PWR_EN" input
+			(at 162.56 46.99 180)
+			(uuid "1e66fc2f-e849-4206-bd4d-a5ec52c17567")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "LED_DATA" input
+			(at 162.56 49.53 180)
+			(uuid "7f25da7b-7e7d-4355-bccd-ec354c6f4bbf")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "LED_FAULT_N" output
+			(at 162.56 52.07 180)
+			(uuid "0d143e96-a265-4d75-b1c0-dd7b8459ff17")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "ENC_A" output
+			(at 162.56 54.61 180)
+			(uuid "d504ff7b-7d2c-4348-b6e3-20c5077c6a1a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "ENC_B" output
+			(at 162.56 57.15 180)
+			(uuid "eb4edb34-690c-46c8-b163-e7de64fb92e5")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "ENC_SW_N" output
+			(at 162.56 59.69 180)
+			(uuid "ddd705f0-571c-4297-8596-b78e97736672")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "solar-controller"
+				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347"
+					(page "4")
 				)
 			)
 		)

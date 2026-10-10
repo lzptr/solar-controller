@@ -5,8 +5,9 @@
 	(uuid "3f61b3f1-b8b2-4822-8a00-85f2a82fd6de")
 	(paper "A4")
 	(title_block
+		(title "LED power and controls")
 		(rev "1")
-		(comment 1 "Design for JLCPCB Service")
+		(comment 1 "JLCPCB")
 	)
 	(lib_symbols
 		(symbol "Connector:USB_C_Receptacle_USB2.0_16P"
@@ -3489,6 +3490,17 @@
 		)
 		(uuid "cba87452-bc55-4101-8860-8ad9465747af")
 	)
+	(text "Supply requirement: dedicated USB-C 5 V / 3 A.\nR206 / R207 provide Rd. No PD negotiation or current detection."
+		(exclude_from_sim no)
+		(at 185.42 96.52 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left top)
+		)
+		(uuid "e6532883-17a3-410f-bca3-db26da330906")
+	)
 	(text "JTAG, Reset, Bootsel, LEDS"
 		(exclude_from_sim no)
 		(at 16.764 145.034 0)
@@ -3595,10 +3607,6 @@
 		(uuid "02bdc647-c8bc-4179-a6b3-2a67cb48951e")
 	)
 	(no_connect
-		(at 72.39 62.23)
-		(uuid "0575abbb-d291-47d6-aa7f-dcba3904f829")
-	)
-	(no_connect
 		(at 72.39 74.93)
 		(uuid "176d8840-8178-4c16-8272-80c6a087213a")
 	)
@@ -3611,32 +3619,16 @@
 		(uuid "29bbbbee-13e6-4fda-8544-86a9a6020ebd")
 	)
 	(no_connect
-		(at 102.87 85.09)
-		(uuid "29c9be75-9b2c-4e25-aa3b-da0eaef3c03f")
-	)
-	(no_connect
 		(at 72.39 69.85)
 		(uuid "349901a7-d0c8-4578-8a78-61ba80dbe02f")
-	)
-	(no_connect
-		(at 102.87 77.47)
-		(uuid "36e23196-0430-49e7-a0db-f585abd07e36")
 	)
 	(no_connect
 		(at 72.39 67.31)
 		(uuid "3d01ae37-b051-48e7-8c0e-85c69ae9a1c2")
 	)
 	(no_connect
-		(at 102.87 80.01)
-		(uuid "4a6c18c2-4014-492f-b891-ce6117e18799")
-	)
-	(no_connect
-		(at 102.87 74.93)
-		(uuid "67fb34e8-5f70-461f-9ccd-acc7407735bd")
-	)
-	(no_connect
-		(at 102.87 82.55)
-		(uuid "6f8ea551-c010-449e-80e9-289c9129ac51")
+		(at 102.87 85.09)
+		(uuid "863abde2-2047-40ce-9e37-f21ebf02b5c8")
 	)
 	(no_connect
 		(at 102.87 67.31)
@@ -3657,10 +3649,6 @@
 	(no_connect
 		(at 102.87 52.07)
 		(uuid "f1e60818-4c7e-4fdc-8a80-f411286adbaf")
-	)
-	(no_connect
-		(at 72.39 64.77)
-		(uuid "f9bc8632-d0dd-458b-8db2-634a1c69fb86")
 	)
 	(wire
 		(pts
@@ -3694,6 +3682,16 @@
 	)
 	(wire
 		(pts
+			(xy 72.39 62.23) (xy 59.69 62.23)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0b065970-c7c3-4046-a4c8-a6baa74cb266")
+	)
+	(wire
+		(pts
 			(xy 261.62 134.62) (xy 274.32 134.62)
 		)
 		(stroke
@@ -3711,6 +3709,16 @@
 			(type default)
 		)
 		(uuid "0d7e36e6-70e1-4d77-986c-5b9016077213")
+	)
+	(wire
+		(pts
+			(xy 102.87 82.55) (xy 120.65 82.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0d838b4e-cea1-456a-8299-222446c86924")
 	)
 	(wire
 		(pts
@@ -3891,6 +3899,16 @@
 			(type default)
 		)
 		(uuid "3e9fc579-2f01-4164-9b84-8fa666ab8f7e")
+	)
+	(wire
+		(pts
+			(xy 72.39 64.77) (xy 59.69 64.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "43ff6271-7faa-4062-bae6-1f0644e6f4c9")
 	)
 	(wire
 		(pts
@@ -4404,6 +4422,16 @@
 	)
 	(wire
 		(pts
+			(xy 102.87 74.93) (xy 120.65 74.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d8fbc320-6fba-4e93-874c-1d85bb417de8")
+	)
+	(wire
+		(pts
 			(xy 195.58 157.48) (xy 195.58 156.21)
 		)
 		(stroke
@@ -4464,6 +4492,16 @@
 	)
 	(wire
 		(pts
+			(xy 102.87 77.47) (xy 120.65 77.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f3f169dd-8bac-4f03-9f3a-7671888c29f5")
+	)
+	(wire
+		(pts
 			(xy 212.09 134.62) (xy 212.09 137.16)
 		)
 		(stroke
@@ -4471,6 +4509,16 @@
 			(type default)
 		)
 		(uuid "f538dac5-9d59-4cd6-bf20-d7dd4aaf0f49")
+	)
+	(wire
+		(pts
+			(xy 102.87 80.01) (xy 120.65 80.01)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f68a63cc-24d5-4345-85ca-c82e89c7769d")
 	)
 	(wire
 		(pts
@@ -4662,6 +4710,72 @@
 		)
 		(uuid "f051dec4-8f75-4243-989a-61ca390df9ad")
 	)
+	(hierarchical_label "ENC_B"
+		(shape input)
+		(at 120.65 77.47 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "80ad9340-e0ab-46a4-a26b-8f4cc8101bf7")
+	)
+	(hierarchical_label "LED_PWR_EN"
+		(shape output)
+		(at 59.69 62.23 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "9d2995bb-fcbf-4a49-bd1b-f91c1fb0d0f5")
+	)
+	(hierarchical_label "ENC_A"
+		(shape input)
+		(at 120.65 74.93 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "e58f9623-ec33-49ab-88ff-7999ee9235ae")
+	)
+	(hierarchical_label "LED_DATA"
+		(shape output)
+		(at 120.65 82.55 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "e94a6b50-07fa-44ac-b983-357a824c6d54")
+	)
+	(hierarchical_label "ENC_SW_N"
+		(shape input)
+		(at 120.65 80.01 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "f028f030-591a-45d4-8a8d-5408bcd06699")
+	)
+	(hierarchical_label "LED_FAULT_N"
+		(shape input)
+		(at 59.69 64.77 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "f176b50a-263a-46f7-826d-9c16937f9f44")
+	)
 	(symbol
 		(lib_id "Connector:USB_C_Receptacle_USB2.0_16P")
 		(at 191.77 132.08 0)
@@ -4673,7 +4787,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "09c6f1b7-7a0b-4213-961e-da06f60d9f66")
-		(property "Reference" "J201"
+		(property "Reference" "J301"
 			(at 185.42 113.03 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4825,7 +4939,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "J201")
+					(reference "J301")
 					(unit 1)
 				)
 			)
@@ -4843,7 +4957,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "0a514528-9b14-40b0-b651-9491ec50f5d8")
-		(property "Reference" "R203"
+		(property "Reference" "R303"
 			(at 51.816 162.052 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4951,7 +5065,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "R203")
+					(reference "R303")
 					(unit 1)
 				)
 			)
@@ -4968,7 +5082,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "1416c58b-183f-4dac-af33-d9003f88704b")
-		(property "Reference" "#PWR0211"
+		(property "Reference" "#PWR0311"
 			(at 243.84 133.35 0)
 			(hide yes)
 			(show_name no)
@@ -5029,7 +5143,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#PWR0211")
+					(reference "#PWR0311")
 					(unit 1)
 				)
 			)
@@ -5047,7 +5161,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "147ff9d6-9da2-45ac-9dcd-860de4474c8d")
-		(property "Reference" "#PWR0213"
+		(property "Reference" "#PWR0313"
 			(at 256.54 147.32 0)
 			(hide yes)
 			(show_name no)
@@ -5108,7 +5222,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#PWR0213")
+					(reference "#PWR0313")
 					(unit 1)
 				)
 			)
@@ -5126,7 +5240,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "26de46e6-8ab4-4848-b0e1-e52af13c0830")
-		(property "Reference" "R205"
+		(property "Reference" "R304"
 			(at 43.688 47.498 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5234,7 +5348,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "R205")
+					(reference "R304")
 					(unit 1)
 				)
 			)
@@ -5252,7 +5366,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "27beb8de-3517-4144-897c-5008e9da9048")
-		(property "Reference" "#PWR0210"
+		(property "Reference" "#PWR0310"
 			(at 213.36 119.38 0)
 			(hide yes)
 			(show_name no)
@@ -5312,7 +5426,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#PWR0210")
+					(reference "#PWR0310")
 					(unit 1)
 				)
 			)
@@ -5330,7 +5444,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "3325cd3b-f00c-433d-ba6c-fddfa81f5ea6")
-		(property "Reference" "R207"
+		(property "Reference" "R308"
 			(at 228.6 124.46 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5427,7 +5541,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "R207")
+					(reference "R308")
 					(unit 1)
 				)
 			)
@@ -5445,7 +5559,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "40593db8-9812-45e2-93d0-335f6852bf56")
-		(property "Reference" "#PWR0205"
+		(property "Reference" "#PWR0306"
 			(at 87.63 106.68 0)
 			(hide yes)
 			(show_name no)
@@ -5527,7 +5641,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#PWR0205")
+					(reference "#PWR0306")
 					(unit 1)
 				)
 			)
@@ -5545,7 +5659,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "47ab3431-83ad-4791-a51b-1bc8f8bb9f16")
-		(property "Reference" "C201"
+		(property "Reference" "C301"
 			(at 38.862 180.594 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5653,7 +5767,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "C201")
+					(reference "C301")
 					(unit 1)
 				)
 			)
@@ -5670,7 +5784,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "4ce80431-358c-4fe9-8295-ae45b1fa35b3")
-		(property "Reference" "#PWR0204"
+		(property "Reference" "#PWR0304"
 			(at 44.45 196.85 0)
 			(hide yes)
 			(show_name no)
@@ -5731,7 +5845,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#PWR0204")
+					(reference "#PWR0304")
 					(unit 1)
 				)
 			)
@@ -5749,7 +5863,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "4db2e430-ed88-4b05-87e3-00843eb1f7b0")
-		(property "Reference" "#PWR0212"
+		(property "Reference" "#PWR0312"
 			(at 256.54 121.92 0)
 			(hide yes)
 			(show_name no)
@@ -5809,7 +5923,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#PWR0212")
+					(reference "#PWR0312")
 					(unit 1)
 				)
 			)
@@ -5826,7 +5940,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "6c5a0d96-831e-44ae-8211-59f1ce4c358a")
-		(property "Reference" "#PWR0209"
+		(property "Reference" "#PWR0309"
 			(at 191.77 163.83 0)
 			(hide yes)
 			(show_name no)
@@ -5887,7 +6001,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#PWR0209")
+					(reference "#PWR0309")
 					(unit 1)
 				)
 			)
@@ -5904,7 +6018,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "831c1945-bceb-4a94-9f9e-1c18ef071ffe")
-		(property "Reference" "SW201"
+		(property "Reference" "SW301"
 			(at 17.272 181.864 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6011,7 +6125,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "SW201")
+					(reference "SW301")
 					(unit 1)
 				)
 			)
@@ -6028,7 +6142,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "83889e0f-557f-4d3b-a7c1-6b7d7bff2fa0")
-		(property "Reference" "#PWR0214"
+		(property "Reference" "#PWR0314"
 			(at 267.97 128.27 0)
 			(hide yes)
 			(show_name no)
@@ -6089,7 +6203,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#PWR0214")
+					(reference "#PWR0314")
 					(unit 1)
 				)
 			)
@@ -6106,7 +6220,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "8cba4178-46be-42c4-9f91-06f657c387e8")
-		(property "Reference" "R202"
+		(property "Reference" "R302"
 			(at 34.544 70.612 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6214,7 +6328,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "R202")
+					(reference "R302")
 					(unit 1)
 				)
 			)
@@ -6232,7 +6346,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "8edfbb42-3b03-4a5a-b546-c80e6072a0f9")
-		(property "Reference" "#PWR0207"
+		(property "Reference" "#PWR0308"
 			(at 109.22 46.99 0)
 			(hide yes)
 			(show_name no)
@@ -6314,7 +6428,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#PWR0207")
+					(reference "#PWR0308")
 					(unit 1)
 				)
 			)
@@ -6332,7 +6446,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "8f575587-8793-4d10-b89a-0a5ef621e00d")
-		(property "Reference" "R210"
+		(property "Reference" "R306"
 			(at 71.628 176.022 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6440,7 +6554,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "R210")
+					(reference "R306")
 					(unit 1)
 				)
 			)
@@ -6457,7 +6571,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "906844b7-26a5-4218-8b71-15a25a3cf95b")
-		(property "Reference" "D302"
+		(property "Reference" "D301"
 			(at 70.866 163.83 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6573,7 +6687,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "D302")
+					(reference "D301")
 					(unit 1)
 				)
 			)
@@ -6590,7 +6704,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "920028ed-376d-4c57-89e1-9db76f535cd3")
-		(property "Reference" "#PWR0202"
+		(property "Reference" "#PWR0302"
 			(at 41.91 72.39 0)
 			(hide yes)
 			(show_name no)
@@ -6650,7 +6764,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#PWR0202")
+					(reference "#PWR0302")
 					(unit 1)
 				)
 			)
@@ -6667,7 +6781,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "976fdcbc-9f10-45df-a50e-3108ce1f6ae9")
-		(property "Reference" "R201"
+		(property "Reference" "R301"
 			(at 24.384 162.052 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6775,7 +6889,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "R201")
+					(reference "R301")
 					(unit 1)
 				)
 			)
@@ -6792,7 +6906,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "9775ecdc-7f57-4929-a10c-2a8a7d7e6cac")
-		(property "Reference" "C203"
+		(property "Reference" "C303"
 			(at 111.76 32.512 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6899,7 +7013,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "C203")
+					(reference "C303")
 					(unit 1)
 				)
 			)
@@ -6917,7 +7031,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "9fed5110-c45d-4024-bad7-9dacb548574e")
-		(property "Reference" "R204"
+		(property "Reference" "R305"
 			(at 52.578 47.498 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7025,7 +7139,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "R204")
+					(reference "R305")
 					(unit 1)
 				)
 			)
@@ -7042,7 +7156,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "aca85e0e-3ea2-407e-9cb4-4fb45bac3ae5")
-		(property "Reference" "#PWR0201"
+		(property "Reference" "#PWR0301"
 			(at 31.75 160.02 0)
 			(hide yes)
 			(show_name no)
@@ -7102,7 +7216,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#PWR0201")
+					(reference "#PWR0301")
 					(unit 1)
 				)
 			)
@@ -7119,7 +7233,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "c57d3047-9a9b-4ac7-a209-42e7c47ed2af")
-		(property "Reference" "#FLG0201"
+		(property "Reference" "#FLG0301"
 			(at 195.58 159.385 0)
 			(hide yes)
 			(show_name no)
@@ -7180,7 +7294,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#FLG0201")
+					(reference "#FLG0301")
 					(unit 1)
 				)
 			)
@@ -7198,7 +7312,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "c69a5eee-914a-4796-a576-9f0bd2b2ab69")
-		(property "Reference" "#PWR0208"
+		(property "Reference" "#PWR0305"
 			(at 50.8 46.99 0)
 			(hide yes)
 			(show_name no)
@@ -7258,7 +7372,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#PWR0208")
+					(reference "#PWR0305")
 					(unit 1)
 				)
 			)
@@ -7275,7 +7389,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "ce7203b5-9487-4aae-83a2-8434e667d75f")
-		(property "Reference" "#PWR0206"
+		(property "Reference" "#PWR0307"
 			(at 109.22 31.75 0)
 			(hide yes)
 			(show_name no)
@@ -7335,7 +7449,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#PWR0206")
+					(reference "#PWR0307")
 					(unit 1)
 				)
 			)
@@ -7352,7 +7466,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "ceb9894d-039f-4153-b0b6-0193a6841b2d")
-		(property "Reference" "SW202"
+		(property "Reference" "SW302"
 			(at 47.498 181.864 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7459,7 +7573,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "SW202")
+					(reference "SW302")
 					(unit 1)
 				)
 			)
@@ -7476,7 +7590,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "d063288e-4930-4121-a09b-f2eb554ab5c9")
-		(property "Reference" "#PWR0203"
+		(property "Reference" "#PWR0303"
 			(at 44.45 160.02 0)
 			(hide yes)
 			(show_name no)
@@ -7536,7 +7650,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#PWR0203")
+					(reference "#PWR0303")
 					(unit 1)
 				)
 			)
@@ -7554,7 +7668,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "d6c49421-09d6-4cac-a8f8-5aded2624963")
-		(property "Reference" "R206"
+		(property "Reference" "R307"
 			(at 228.6 119.38 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7651,7 +7765,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "R206")
+					(reference "R307")
 					(unit 1)
 				)
 			)
@@ -7668,7 +7782,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "d7e4736c-ed81-4ed9-9276-ce989a10297c")
-		(property "Reference" "C204"
+		(property "Reference" "C304"
 			(at 265.684 112.776 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7776,7 +7890,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "C204")
+					(reference "C304")
 					(unit 1)
 				)
 			)
@@ -7793,7 +7907,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "df37684f-7700-4229-9e6f-7ce444706a44")
-		(property "Reference" "U202"
+		(property "Reference" "U302"
 			(at 259.588 127.508 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7889,7 +8003,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "U202")
+					(reference "U302")
 					(unit 1)
 				)
 			)
@@ -7906,7 +8020,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "e2d89426-ec49-403d-a0df-eb76b7c73687")
-		(property "Reference" "#FLG0202"
+		(property "Reference" "#FLG0302"
 			(at 215.265 116.84 0)
 			(hide yes)
 			(show_name no)
@@ -7967,7 +8081,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "#FLG0202")
+					(reference "#FLG0302")
 					(unit 1)
 				)
 			)
@@ -7984,7 +8098,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "edb069f8-dd88-4167-9e54-eda9ff50ff28")
-		(property "Reference" "C202"
+		(property "Reference" "C302"
 			(at 99.06 33.02 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8092,7 +8206,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "C202")
+					(reference "C302")
 					(unit 1)
 				)
 			)
@@ -8109,7 +8223,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "f7394362-a6c3-47fb-a3bb-a20838049feb")
-		(property "Reference" "U201"
+		(property "Reference" "U301"
 			(at 89.916 45.974 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8348,7 +8462,7 @@
 		(instances
 			(project "solar-controller"
 				(path "/1ebd2a79-85df-49b0-bc4d-96f69f4cf347/79d4efb6-63ee-4f28-a804-ad9340df499b"
-					(reference "U201")
+					(reference "U301")
 					(unit 1)
 				)
 			)

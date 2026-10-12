@@ -1,0 +1,7 @@
+menu "Solar Controller"
+
+    # Keep fragments below component roots to avoid automatic duplicate inclusion.
+    rsource "../components/bsp/config/Kconfig"
+    rsource "../components/led_ring/config/Kconfig"
+
+endmenu

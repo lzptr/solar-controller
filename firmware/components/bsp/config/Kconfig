@@ -1,0 +1,16 @@
+menu "Board"
+
+config BSP_BOARD_ESP32_C6_DEV_KIT_N8
+    bool "Enable the Waveshare ESP32-C6-DEV-KIT-N8 BSP"
+    default y
+
+config BSP_LED_DATA_GPIO
+    int "SK6812 data GPIO"
+    default 7
+
+config BSP_LED_COUNT
+    int "Number of SK6812 RGBW LEDs on the data line"
+    range 1 64
+    default 7
+
+endmenu

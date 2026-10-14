@@ -13,18 +13,19 @@ esp_err_t board_init(void) {
     return ESP_OK;
   }
 
-  const gpio_config_t output_config = {
+  // Hold the SK6812 data line low with the pull-down until the RMT driver
+  // claims it. Configuring it as a GPIO output here would reserve the pin and
+  // make the RMT driver report a conflict.
+  const gpio_config_t led_data_config = {
       .pin_bit_mask = 1ULL << CONFIG_BSP_LED_DATA_GPIO,
-      .mode = GPIO_MODE_OUTPUT,
+      .mode = GPIO_MODE_INPUT,
       .pull_up_en = GPIO_PULLUP_DISABLE,
-      .pull_down_en = GPIO_PULLDOWN_DISABLE,
+      .pull_down_en = GPIO_PULLDOWN_ENABLE,
       .intr_type = GPIO_INTR_DISABLE,
   };
 
-  ESP_RETURN_ON_ERROR(gpio_config(&output_config), TAG,
-                      "configure LED data output");
-  ESP_RETURN_ON_ERROR(gpio_set_level(board_led_data_gpio(), 0), TAG,
-                      "idle LED data low");
+  ESP_RETURN_ON_ERROR(gpio_config(&led_data_config), TAG,
+                      "pull LED data low");
 
   initialized = true;
   return ESP_OK;

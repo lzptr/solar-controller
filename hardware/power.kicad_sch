@@ -3105,7 +3105,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.everlighteurope.com/custom/files/datasheets/DSE-0006814.pdf"
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C965804.html"
 			(at 138.43 71.12 0)
 			(hide yes)
 			(show_name no)
@@ -3137,7 +3137,7 @@
 				)
 			)
 		)
-		(property "LCSC Part #" "C2994781"
+		(property "LCSC Part #" "C965804"
 			(at 138.43 71.12 0)
 			(hide yes)
 			(show_name no)
@@ -3170,7 +3170,7 @@
 				)
 			)
 		)
-		(property "JLC_PART" "E"
+		(property "JLC_PART" "B"
 			(at 138.43 71.12 90)
 			(hide yes)
 			(show_name no)

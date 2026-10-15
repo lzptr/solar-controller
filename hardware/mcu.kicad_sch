@@ -5466,7 +5466,7 @@
 				)
 			)
 		)
-		(property "Rating" "25V"
+		(property "Rating" "10V"
 			(at 38.862 185.674 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5477,7 +5477,7 @@
 				(justify left)
 			)
 		)
-		(property "LCSC Part #" "C52923"
+		(property "LCSC Part #" "C14445"
 			(at 31.75 182.88 0)
 			(hide yes)
 			(show_name no)
@@ -6354,7 +6354,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.everlighteurope.com/custom/files/datasheets/DSE-0006814.pdf"
+		(property "Datasheet" "https://www.lcsc.com/product-detail/C965804.html"
 			(at 64.77 165.1 0)
 			(hide yes)
 			(show_name no)
@@ -6386,7 +6386,7 @@
 				)
 			)
 		)
-		(property "LCSC Part #" "C2994781"
+		(property "LCSC Part #" "C965804"
 			(at 64.77 165.1 0)
 			(hide yes)
 			(show_name no)
@@ -6419,7 +6419,7 @@
 				)
 			)
 		)
-		(property "JLC_PART" "E"
+		(property "JLC_PART" "B"
 			(at 64.77 165.1 90)
 			(hide yes)
 			(show_name no)

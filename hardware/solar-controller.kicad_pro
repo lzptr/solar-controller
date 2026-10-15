@@ -40,8 +40,8 @@
         "other_text_upright": false,
         "pads": {
           "drill": 0.0,
-          "height": 0.6,
-          "width": 1.325
+          "height": 1.6,
+          "width": 3.5
         },
         "silk_line_width": 0.15,
         "silk_text_italic": false,
@@ -63,7 +63,7 @@
           "min_clearance": 0.2,
           "min_island_area": 10.0,
           "min_thickness": 0.2,
-          "pad_connection": 2,
+          "pad_connection": 1,
           "remove_islands": 0,
           "thermal_relief_gap": 0.2,
           "thermal_relief_spoke_width": 0.25
@@ -81,7 +81,12 @@
           "width": 0.2906
         }
       ],
-      "drc_exclusions": [],
+      "drc_exclusions": [
+        [
+          "lib_footprint_mismatch|119000000|126740000|53a9b8e0-511d-4914-9140-749c1ebfbc8e|00000000-0000-0000-0000-000000000000",
+          ""
+        ]
+      ],
       "meta": {
         "filename": "board_design_settings.json",
         "version": 2
@@ -140,12 +145,12 @@
         "too_many_vias": "error",
         "track_angle": "error",
         "track_dangling": "warning",
-        "track_not_centered_on_via": "ignore",
+        "track_not_centered_on_via": "warning",
         "track_on_post_machined_layer": "error",
         "track_segment_length": "error",
         "track_width": "error",
         "tracks_crossing": "error",
-        "tuning_profile_track_geometries": "ignore",
+        "tuning_profile_track_geometries": "warning",
         "unconnected_items": "error",
         "unresolved_variable": "error",
         "via_dangling": "warning",
@@ -161,16 +166,16 @@
         "min_groove_width": 0.0,
         "min_hole_clearance": 0.35,
         "min_hole_to_hole": 0.3,
-        "min_microvia_diameter": 0.0,
-        "min_microvia_drill": 0.0,
+        "min_microvia_diameter": 0.2,
+        "min_microvia_drill": 0.1,
         "min_resolved_spokes": 2,
         "min_silk_clearance": 0.0,
         "min_text_height": 0.5,
         "min_text_thickness": 0.08,
-        "min_through_hole_diameter": 0.3,
+        "min_through_hole_diameter": 0.2,
         "min_track_width": 0.1,
-        "min_via_annular_width": 0.25,
-        "min_via_diameter": 0.5,
+        "min_via_annular_width": 0.15,
+        "min_via_diameter": 0.45,
         "solder_mask_to_copper_clearance": 0.005,
         "use_height_for_length_calcs": true
       },
@@ -225,7 +230,8 @@
         0.3,
         0.3586,
         0.5,
-        1.0
+        1.0,
+        2.0
       ],
       "tuning_pattern_settings": {
         "diff_pair_defaults": {
@@ -259,8 +265,8 @@
           "drill": 0.0
         },
         {
-          "diameter": 0.7,
-          "drill": 0.3
+          "diameter": 0.5,
+          "drill": 0.2
         }
       ],
       "zones_allow_external_fillets": false
@@ -537,7 +543,7 @@
         "clearance": 0.1,
         "diff_pair_gap": 0.2032,
         "diff_pair_via_gap": 0.25,
-        "diff_pair_width": 0.1537,
+        "diff_pair_width": 0.2906,
         "line_style": 0,
         "microvia_diameter": 0.6858,
         "microvia_drill": 0.3302,
@@ -555,7 +561,11 @@
     "meta": {
       "version": 5
     },
-    "net_colors": null,
+    "net_colors": {
+      "+3V3": "rgb(255, 14, 175)",
+      "+5V": "rgb(85, 255, 37)",
+      "VBUS": "rgb(75, 16, 255)"
+    },
     "netclass_assignments": null,
     "netclass_patterns": []
   },
@@ -688,7 +698,7 @@
         "uuid": "1ebd2a79-85df-49b0-bc4d-96f69f4cf347"
       }
     ],
-    "used_designators": "#FLG201-203,#FLG301-302,U201-203,U301-302,R201-211,R301-308,R404,C201-206,C301-304,C401,D201-202,D301-302,#PWR1-3,#PWR201-223,#PWR301-314,#PWR401-406,#PWR408-417,J201,J301,L201,L301,SW201-202,SW301-302",
+    "used_designators": "#FLG201-203,#FLG301-302,U201-203,U301-302,R201-211,R301-308,R404,C201-206,C301-304,C401,D201-202,D301-302,#PWR1-3,#PWR101,#PWR201-223,#PWR301-314,#PWR401-406,#PWR408-418,J201,J301,H101-104,L201,L301,SW201-202,SW301-302",
     "variants": []
   },
   "sheets": [

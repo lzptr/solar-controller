@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "LedAdapter")(type "KiCad")(uri "${KIPRJMOD}/LedAdapter.kicad_sym")(options "")(descr "LED adapter project symbols"))
+)

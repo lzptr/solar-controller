@@ -1,0 +1,131 @@
+(footprint "LED_Ring_SK6812_7_D23_Pins"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(descr "Interface to the 23 mm 7x SK6812 RGBW ring: five 1.2 mm pin holes on the ring's pad pattern (ring seen from its back) and its two 2.9 mm mounting holes, 19.2 mm apart")
+	(tags "LED ring adapter pins")
+	(attr through_hole exclude_from_pos_files exclude_from_bom)
+	(property "Reference" "REF**"
+		(at 0 -7.5 0)
+		(layer "F.Fab")
+		(uuid "8baa0e48-6dc2-4549-9dae-107f15cd452f")
+		(effects
+			(font
+				(size 1.0 1.0)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "LED_Ring_SK6812_7_D23_Pins"
+		(at 0 7.5 0)
+		(layer "F.Fab")
+		(uuid "134ba66b-5dbb-448a-a2a0-8b5662519344")
+		(effects
+			(font
+				(size 1.0 1.0)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "bf4d218f-04b7-4533-a430-34d0bb4a1173")
+		(effects
+			(font
+				(size 1.0 1.0)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "a7a8e35a-c3dc-4e44-ae7f-647fc07f3b59")
+		(effects
+			(font
+				(size 1.0 1.0)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" thru_hole circle
+		(at -2.54 -4.57)
+		(size 2.0 2.0)
+		(drill 1.2)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "303d2262-a814-4a39-a7ff-09d8ec28a221")
+	)
+	(pad "2" thru_hole circle
+		(at 2.54 -4.57)
+		(size 2.0 2.0)
+		(drill 1.2)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "8c571ea8-dc51-4415-9341-bf41717b5a14")
+	)
+	(pad "3" thru_hole circle
+		(at 5.33 -0.0)
+		(size 2.0 2.0)
+		(drill 1.2)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "aa5333af-4eb4-495f-a062-e48b67e264b8")
+	)
+	(pad "4" thru_hole circle
+		(at 2.54 4.57)
+		(size 2.0 2.0)
+		(drill 1.2)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "3a623340-6ccf-42e6-bd5a-95faca31c467")
+	)
+	(pad "5" thru_hole circle
+		(at -2.54 4.57)
+		(size 2.0 2.0)
+		(drill 1.2)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "9ee3e2c2-3e79-4da1-a7e1-4d014affa00a")
+	)
+	(pad "" np_thru_hole circle
+		(at -9.6 0)
+		(size 2.9 2.9)
+		(drill 2.9)
+		(layers "*.Cu" "*.Mask")
+		(uuid "cffdf337-5f6a-4bee-9cef-bf9a6873afc5")
+	)
+	(pad "" np_thru_hole circle
+		(at 9.6 0)
+		(size 2.9 2.9)
+		(drill 2.9)
+		(layers "*.Cu" "*.Mask")
+		(uuid "c7d6d9be-b631-4b12-a6c2-f89cfce455e0")
+	)
+	(fp_circle
+		(center 0 0)
+		(end 11.5 0)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "d845e3bb-d16f-497c-b7d4-dfccc29e9289")
+	)
+	(fp_text user "LED RING (BACK)"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(uuid "b9e5b448-43d9-4472-9a2e-d9e5d77f3865")
+		(effects
+			(font
+				(size 0.7 0.7)
+				(thickness 0.12)
+			)
+		)
+	)
+)

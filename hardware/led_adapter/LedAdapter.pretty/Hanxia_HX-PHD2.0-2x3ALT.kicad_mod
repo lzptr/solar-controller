@@ -1,0 +1,224 @@
+(footprint "Hanxia_HX-PHD2.0-2x3ALT"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(descr "hanxia HX-PHD2.0-2x3ALT, 2x3 top-entry SMD wafer 2.0 mm pitch, JST PHD compatible, manufacturer land pattern (pads 1.1x4.25, 9.5 mm row span)")
+	(tags "connector PHD 2.0mm dual row SMD vertical")
+	(attr smd)
+	(property "Reference" "REF**"
+		(at 0 -6.0 0)
+		(layer "F.Fab")
+		(uuid "a84792e5-be7b-4c32-9b01-de36462e9277")
+		(effects
+			(font
+				(size 1.0 1.0)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "Hanxia_HX-PHD2.0-2x3ALT"
+		(at 0 6.2 0)
+		(layer "F.Fab")
+		(uuid "5b0d86a7-e64c-44f2-99b9-eff5640ac741")
+		(effects
+			(font
+				(size 1.0 1.0)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "cc2f08b2-d72a-4845-804b-3dd26d2a0729")
+		(effects
+			(font
+				(size 1.0 1.0)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "7264b377-54d5-4adf-af02-d197ba11287a")
+		(effects
+			(font
+				(size 1.0 1.0)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" smd rect
+		(at 2 2.625)
+		(size 1.1 4.25)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "fb5804bc-6217-4b93-a087-234af73cad3c")
+	)
+	(pad "2" smd rect
+		(at 2 -2.625)
+		(size 1.1 4.25)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "3e6141a6-f86a-4271-a01f-fa720ce8cb71")
+	)
+	(pad "3" smd rect
+		(at 0 2.625)
+		(size 1.1 4.25)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "1cc359e4-2e23-42b9-8acf-e26bcb6c97d2")
+	)
+	(pad "4" smd rect
+		(at 0 -2.625)
+		(size 1.1 4.25)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "97242cc1-01d5-4c67-881f-588c43f8d43f")
+	)
+	(pad "5" smd rect
+		(at -2 2.625)
+		(size 1.1 4.25)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "70559f46-91f8-409a-9aba-927e1ac8720d")
+	)
+	(pad "6" smd rect
+		(at -2 -2.625)
+		(size 1.1 4.25)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "21625ff5-246c-4412-9fa3-78d551251e68")
+	)
+	(fp_line
+		(start -4.0 -2.775)
+		(end 4.0 -2.775)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "849758c1-ebfe-45bb-bfc6-8c8cdb45383d")
+	)
+	(fp_line
+		(start 4.0 -2.775)
+		(end 4.0 1.775)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "d97ffab7-b678-4843-8486-2e857f00b7bc")
+	)
+	(fp_line
+		(start 4.0 1.775)
+		(end 3.0 2.775)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "53403df7-a73e-4634-a73b-44afb216e00d")
+	)
+	(fp_line
+		(start 3.0 2.775)
+		(end -4.0 2.775)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "ec32f501-340c-4282-a36b-b5500268b363")
+	)
+	(fp_line
+		(start -4.0 2.775)
+		(end -4.0 -2.775)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "b82b4eb2-9677-4500-a8e0-82186705c668")
+	)
+	(fp_text user "1"
+		(at 2.0 1.8 0)
+		(layer "F.Fab")
+		(uuid "877d597d-6bae-4ff8-b53e-f118d813d91a")
+		(effects
+			(font
+				(size 0.6 0.6)
+				(thickness 0.12)
+			)
+		)
+	)
+	(fp_line
+		(start -4.11 -1.4)
+		(end -4.11 0.5)
+		(stroke
+			(width 0.15)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "521182a4-72de-480d-b109-1534716429f0")
+	)
+	(fp_line
+		(start 4.11 -1.4)
+		(end 4.11 0.5)
+		(stroke
+			(width 0.15)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "19fa64fa-8a3d-4d9a-8918-060c90ac32f6")
+	)
+	(fp_line
+		(start 1.6 5.1)
+		(end 2.4 5.1)
+		(stroke
+			(width 0.15)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "21c354d4-d47b-4685-9181-169976a3bb59")
+	)
+	(fp_line
+		(start 1.6 5.1)
+		(end 2.0 5.5)
+		(stroke
+			(width 0.15)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "2800722f-c0aa-4e42-b4d6-59d3aa284466")
+	)
+	(fp_line
+		(start 2.4 5.1)
+		(end 2.0 5.5)
+		(stroke
+			(width 0.15)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "ad77eeaa-844f-4d21-84c4-e0bf9ccaa040")
+	)
+	(fp_rect
+		(start -4.25 -5.0)
+		(end 4.25 5.0)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "a9f79c99-9326-4c5d-bf33-9f694c8fa773")
+	)
+	(model "${KIPRJMOD}/LedAdapter.3dshapes/Hanxia_HX-PHD2.0-2x3ALT.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)

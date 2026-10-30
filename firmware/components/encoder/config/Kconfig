@@ -1,0 +1,14 @@
+menu "Encoder"
+
+config ENCODER_COUNTS_PER_DETENT
+    int "Quadrature edges per detent"
+    range 1 4
+    default 2
+    help
+        EC11J1525402: 15 pulses (60 edges) and 30 detents per turn.
+
+config ENCODER_REVERSE
+    bool "Reverse the turn direction"
+    default n
+
+endmenu

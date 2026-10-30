@@ -1,0 +1,33 @@
+menu "Lamp"
+
+config LAMP_LEVELS
+    int "Brightness levels above off"
+    range 2 100
+    default 30
+    help
+        One encoder detent per level; 30 is one full turn from off to full.
+
+config LAMP_MIN_BRIGHTNESS_PERMILLE
+    int "Brightness of level 1 (permille of full)"
+    range 1 1000
+    default 20
+    help
+        Levels rise in equal ratios from here to full. SK6812 channels are
+        8 bit, so much lower makes dim colours drop out.
+
+config LAMP_DEFAULT_BUDGET_MA
+    int "Default LED current budget (mA)"
+    range 50 2000
+    default 400
+    help
+        Fits a laptop USB port. Raise it with 'budget' on a 5 V / 3 A supply.
+        Capped 200 mA below LAMP_OVERCURRENT_MA.
+
+config LAMP_OVERCURRENT_MA
+    int "Measured LED current that latches LED power off (mA)"
+    range 300 2200
+    default 1800
+    help
+        Just under U402's 2.04 A limit. The budget is capped 200 mA below.
+
+endmenu

@@ -18,10 +18,12 @@ config LAMP_MIN_BRIGHTNESS_PERMILLE
 config LAMP_DEFAULT_BUDGET_MA
     int "Default LED current budget (mA)"
     range 50 2000
-    default 400
+    default 1600
     help
-        Fits a laptop USB port. Raise it with 'budget' on a 5 V / 3 A supply.
-        Capped 200 mA below LAMP_OVERCURRENT_MA.
+        The highest budget allowed, so the full chain can reach full
+        brightness (70 LEDs at full white take about 1.2 A). A laptop USB port
+        may not supply that; lower it with 'budget', e.g. 400. Capped 200 mA
+        below LAMP_OVERCURRENT_MA.
 
 config LAMP_OVERCURRENT_MA
     int "Measured LED current that latches LED power off (mA)"

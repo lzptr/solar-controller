@@ -67,9 +67,8 @@ static void print_permille(const char *label, unsigned permille) {
 static void print_status(void) {
   lamp_status_t s;
   lamp_get_status(&s);
-  printf("lamp    level %u/%u", s.level, s.level_count);
-  print_permille(" (", s.brightness_permille);
-  printf(")  %s  %s\n", s.mode == LAMP_MODE_WHITE ? "white" : "colour",
+  print_permille("lamp    brightness ", s.brightness_permille);
+  printf("  %s  %s\n", s.mode == LAMP_MODE_WHITE ? "white" : "colour",
          s.manual ? "MANUAL (type 'scene' to leave)" : "scene");
   printf("power   EN %s%s  FLT %s  fault: %s\n",
          s.power_enabled ? "on" : "off", s.power_ramping ? " (ramping)" : "",
@@ -106,13 +105,11 @@ static int cmd_status(int argc, char **argv) {
 }
 
 static int cmd_bright(int argc, char **argv) {
-  lamp_status_t s;
-  lamp_get_status(&s);
-  unsigned long level;
-  if (argc != 2 || !parse_uint(argv[1], s.level_count, &level)) {
+  unsigned long percent;
+  if (argc != 2 || !parse_uint(argv[1], 100, &percent)) {
     return usage(argv[0]);
   }
-  return finish(lamp_set_level((uint8_t)level));
+  return finish(lamp_set_brightness((uint16_t)(percent * 10)));
 }
 
 static int cmd_mode(int argc, char **argv) {
@@ -307,10 +304,10 @@ typedef struct {
 } command_t;
 
 static const command_t COMMANDS[] = {
-    {"status", NULL, "Show level, mode, LED power, fault and current",
+    {"status", NULL, "Show brightness, mode, LED power, fault and current",
      cmd_status},
-    {"bright", "<level>",
-     "Set the brightness level, 0 = off (eFuse off); saved after 3 s",
+    {"bright", "<0-100>",
+     "Set the brightness in percent, 0 = off (eFuse off); saved after 3 s",
      cmd_bright},
     {"mode", "colour|white", "Planet colours or the white mix; saved after 3 s",
      cmd_mode},

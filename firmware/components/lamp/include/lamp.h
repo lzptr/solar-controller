@@ -29,9 +29,7 @@ typedef enum {
 } lamp_fault_t;
 
 typedef struct {
-  uint8_t level; /**< 0 = off */
-  uint8_t level_count;
-  uint16_t brightness_permille;
+  uint16_t brightness_permille; /**< 0 = off */
   lamp_mode_t mode;
   bool manual; /**< Debug frame from the CLI instead of the scene */
 
@@ -51,7 +49,7 @@ typedef struct {
 
 /**
  * Load the settings from NVS, start the LED, power and encoder drivers and
- * the lamp task. LED power comes back on if the saved level is above 0.
+ * the lamp task. LED power comes back on if the saved brightness is above 0.
  * Every function below is thread-safe.
  */
 esp_err_t lamp_start(void);
@@ -69,11 +67,13 @@ esp_err_t lamp_led(size_t index, led_ring_rgbw_t *stored,
                    led_ring_rgbw_t *sent);
 
 /*
- * Scene settings. Level and mode are saved to NVS a few seconds after the
- * last change; the rest only by lamp_save_config(). Level, mode and colour
- * changes leave manual mode.
+ * Scene settings. Brightness and mode are saved to NVS a few seconds after
+ * the last change; the rest only by lamp_save_config(). Brightness, mode and
+ * colour changes leave manual mode.
  */
-esp_err_t lamp_set_level(uint8_t level);
+
+/** 0-1000 permille of full; 0 switches LED power off. */
+esp_err_t lamp_set_brightness(uint16_t permille);
 esp_err_t lamp_set_mode(lamp_mode_t mode);
 esp_err_t lamp_set_globe_color(size_t globe, led_ring_rgbw_t color);
 esp_err_t lamp_set_white_color(led_ring_rgbw_t color);

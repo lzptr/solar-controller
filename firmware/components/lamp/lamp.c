@@ -27,7 +27,7 @@
 #define GUARD_DOWN 50
 #define GUARD_UP 10
 
-#define STATE_VERSION 1
+#define STATE_VERSION 2
 #define CONFIG_VERSION 1
 
 static const char *TAG = "lamp";
@@ -57,8 +57,8 @@ typedef enum { POWER_OFF, POWER_RAMPING, POWER_ON } power_state_t;
 // NVS blobs; bump the version when the layout changes.
 typedef struct {
   uint8_t version;
-  uint8_t level;
   uint8_t mode;
+  uint16_t brightness; // permille of full
 } saved_state_t;
 
 typedef struct {
@@ -83,20 +83,44 @@ static uint16_t guard = 1000;
 static int overcurrent_samples;
 static led_power_sample_t measured;
 static int64_t state_save_ms;
+static uint16_t encoder_steps[CONFIG_LAMP_ENCODER_STEPS];
 
 static int64_t now_ms(void) { return esp_timer_get_time() / 1000; }
 
 static uint32_t budget_max_ma(void) { return CONFIG_LAMP_OVERCURRENT_MA - 200; }
 
-// Perceptual steps: equal ratios from the lowest level to full.
-static uint16_t level_permille(uint8_t level) {
-  if (level == 0) {
-    return 0;
-  }
+// Encoder stops: equal ratios from the lowest step to full, so each detent
+// looks about as big.
+static void init_encoder_steps(void) {
   const float lowest = CONFIG_LAMP_MIN_BRIGHTNESS_PERMILLE / 1000.0f;
-  const float exponent =
-      (float)(CONFIG_LAMP_LEVELS - level) / (CONFIG_LAMP_LEVELS - 1);
-  return (uint16_t)lroundf(1000.0f * powf(lowest, exponent));
+  for (int i = 0; i < CONFIG_LAMP_ENCODER_STEPS; i++) {
+    const float exponent = (float)(CONFIG_LAMP_ENCODER_STEPS - 1 - i) /
+                           (CONFIG_LAMP_ENCODER_STEPS - 1);
+    encoder_steps[i] = (uint16_t)lroundf(1000.0f * powf(lowest, exponent));
+  }
+}
+
+// Move to the next stop above or below, so a brightness set from the CLI
+// between two stops snaps onto the curve with the first detent.
+static uint16_t step_brightness(uint16_t permille, int steps) {
+  for (; steps > 0; steps--) {
+    int i = 0;
+    while (i < CONFIG_LAMP_ENCODER_STEPS && encoder_steps[i] <= permille) {
+      i++;
+    }
+    if (i == CONFIG_LAMP_ENCODER_STEPS) {
+      break;
+    }
+    permille = encoder_steps[i];
+  }
+  for (; steps < 0; steps++) {
+    int i = CONFIG_LAMP_ENCODER_STEPS - 1;
+    while (i >= 0 && encoder_steps[i] >= permille) {
+      i--;
+    }
+    permille = i >= 0 ? encoder_steps[i] : 0;
+  }
+  return permille;
 }
 
 static uint8_t scale_channel(uint8_t value, uint16_t permille) {
@@ -113,7 +137,7 @@ static led_ring_rgbw_t scale_color(led_ring_rgbw_t color, uint16_t permille) {
 }
 
 static void build_scene(void) {
-  const uint16_t permille = level_permille(state.level);
+  const uint16_t permille = state.brightness;
   for (size_t i = 0; i < led_ring_count(); i++) {
     const led_ring_rgbw_t base =
         state.mode == LAMP_MODE_WHITE
@@ -134,7 +158,8 @@ static void show(void) {
 // the lock held after any change.
 static void update(void) {
   const bool want_power =
-      fault == LAMP_FAULT_NONE && (manual ? manual_power : state.level > 0);
+      fault == LAMP_FAULT_NONE &&
+      (manual ? manual_power : state.brightness > 0);
 
   if (!want_power && power != POWER_OFF) {
     // Blank the chain while it still has power, then cut it.
@@ -197,15 +222,13 @@ static void handle_input(encoder_event_t event) {
   manual = false;
 
   if (event.steps != 0) {
-    int level = state.level + event.steps;
-    level = level < 0 ? 0 : level > CONFIG_LAMP_LEVELS ? CONFIG_LAMP_LEVELS
-                                                       : level;
-    if (level != state.level) {
-      state.level = (uint8_t)level;
+    const uint16_t brightness = step_brightness(state.brightness, event.steps);
+    if (brightness != state.brightness) {
+      state.brightness = brightness;
       mark_state_dirty();
     }
-    ESP_LOGI(TAG, "encoder %+d -> level %u/%u", event.steps, state.level,
-             CONFIG_LAMP_LEVELS);
+    ESP_LOGI(TAG, "encoder %+d -> %u.%u%%", event.steps,
+             state.brightness / 10, state.brightness % 10);
   }
   if (event.pressed) {
     state.mode =
@@ -321,7 +344,7 @@ static void load_settings(void) {
     default_config();
   }
   if (!load_blob("state", &state, sizeof(state)) ||
-      state.version != STATE_VERSION || state.level > CONFIG_LAMP_LEVELS ||
+      state.version != STATE_VERSION || state.brightness > 1000 ||
       state.mode > LAMP_MODE_WHITE) {
     state = (saved_state_t){.version = STATE_VERSION};
   }
@@ -346,6 +369,7 @@ esp_err_t lamp_start(void) {
   ESP_RETURN_ON_ERROR(encoder_init(), TAG, "encoder");
   ESP_RETURN_ON_ERROR(open_nvs(), TAG, "open NVS");
   load_settings();
+  init_encoder_steps();
 
   ESP_RETURN_ON_ERROR(led_ring_set_count(config.led_count), TAG, "LED count");
   led_ring_set_budget_ma(config.budget_ma);
@@ -353,8 +377,8 @@ esp_err_t lamp_start(void) {
   lock = xSemaphoreCreateMutex();
   ESP_RETURN_ON_FALSE(lock != NULL, ESP_ERR_NO_MEM, TAG, "create lock");
   update();
-  ESP_LOGI(TAG, "level %u/%u, %s, %u LEDs, budget %u mA", state.level,
-           CONFIG_LAMP_LEVELS,
+  ESP_LOGI(TAG, "brightness %u.%u%%, %s, %u LEDs, budget %u mA",
+           state.brightness / 10, state.brightness % 10,
            state.mode == LAMP_MODE_WHITE ? "white" : "colour",
            config.led_count, config.budget_ma);
 
@@ -367,9 +391,7 @@ esp_err_t lamp_start(void) {
 void lamp_get_status(lamp_status_t *status) {
   xSemaphoreTake(lock, portMAX_DELAY);
   *status = (lamp_status_t){
-      .level = state.level,
-      .level_count = CONFIG_LAMP_LEVELS,
-      .brightness_permille = level_permille(state.level),
+      .brightness_permille = state.brightness,
       .mode = state.mode,
       .manual = manual,
       .power_enabled = led_power_enabled(),
@@ -432,12 +454,12 @@ esp_err_t lamp_led(size_t index, led_ring_rgbw_t *stored,
   return valid ? ESP_OK : ESP_ERR_INVALID_ARG;
 }
 
-esp_err_t lamp_set_level(uint8_t level) {
-  ESP_RETURN_ON_FALSE(level <= CONFIG_LAMP_LEVELS, ESP_ERR_INVALID_ARG, TAG,
-                      "level %u out of range", level);
+esp_err_t lamp_set_brightness(uint16_t permille) {
+  ESP_RETURN_ON_FALSE(permille <= 1000, ESP_ERR_INVALID_ARG, TAG,
+                      "brightness %u out of range", permille);
   xSemaphoreTake(lock, portMAX_DELAY);
   manual = false;
-  state.level = level;
+  state.brightness = permille;
   mark_state_dirty();
   update();
   xSemaphoreGive(lock);

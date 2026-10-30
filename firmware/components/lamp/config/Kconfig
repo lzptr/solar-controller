@@ -1,19 +1,19 @@
 menu "Lamp"
 
-config LAMP_LEVELS
-    int "Brightness levels above off"
+config LAMP_ENCODER_STEPS
+    int "Encoder detents from off to full brightness"
     range 2 100
     default 30
     help
-        One encoder detent per level; 30 is one full turn from off to full.
+        30 is one full turn of the EC11. The steps rise in equal ratios from
+        LAMP_MIN_BRIGHTNESS_PERMILLE to 100 %, so each one looks about as big.
 
 config LAMP_MIN_BRIGHTNESS_PERMILLE
-    int "Brightness of level 1 (permille of full)"
+    int "Brightness of the first encoder step (permille of full)"
     range 1 1000
     default 20
     help
-        Levels rise in equal ratios from here to full. SK6812 channels are
-        8 bit, so much lower makes dim colours drop out.
+        SK6812 channels are 8 bit, so much lower makes dim colours drop out.
 
 config LAMP_DEFAULT_BUDGET_MA
     int "Default LED current budget (mA)"

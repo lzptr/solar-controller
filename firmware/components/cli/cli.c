@@ -304,8 +304,8 @@ static const command_t COMMANDS[] = {
      "brightness); the button cycles them; saved after 3 s",
      cmd_mode},
     {"globe", "[<0-9> <r> <g> <b> <w>]",
-     "List the globe colours, or set one (0 = Sun, also used for white mode "
-     "... 9 = Pluto); 'save' keeps it",
+     "List the globe colours, or set one (0 = Sun ... 9 = Pluto); 'save' "
+     "keeps it",
      cmd_globe},
     {"count", "<1-" STR(CONFIG_BSP_LED_MAX) ">",
      "LEDs on the chain, 7 per globe; 'save' keeps it", cmd_count},

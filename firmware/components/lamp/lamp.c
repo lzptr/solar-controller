@@ -52,6 +52,10 @@ static const led_ring_rgbw_t DEFAULT_GLOBES[LAMP_GLOBE_COUNT] = {
     {120, 70, 50, 60},  // Pluto
 };
 
+// White mode: every globe in the Sun's built-in colour. Fixed, so 'globe'
+// only ever changes the one globe it names.
+static const led_ring_rgbw_t WARM_WHITE = {255, 110, 0, 60};
+
 typedef enum { POWER_OFF, POWER_RAMPING, POWER_ON } power_state_t;
 
 // NVS blobs; bump the version when the layout changes.
@@ -68,7 +72,7 @@ typedef struct {
   led_ring_rgbw_t globes[LAMP_GLOBE_COUNT];
 } saved_config_t;
 
-// Version 1 also had a separate white mix; white now uses the Sun's colour.
+// Version 1 also had a tunable white mix; white is now fixed.
 typedef struct {
   uint8_t version;
   uint8_t led_count;
@@ -149,7 +153,7 @@ static void build_scene(void) {
   for (size_t i = 0; i < led_ring_count(); i++) {
     const led_ring_rgbw_t base =
         state.mode == LAMP_MODE_WHITE
-            ? config.globes[0]
+            ? WARM_WHITE
             : config.globes[(i / LAMP_LEDS_PER_GLOBE) % LAMP_GLOBE_COUNT];
     led_ring_set_pixel(i, scale_color(base, permille));
   }

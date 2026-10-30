@@ -19,7 +19,7 @@ extern "C" {
 
 typedef enum {
   LAMP_MODE_COLOUR, /**< Each globe in its own colour */
-  LAMP_MODE_WHITE,  /**< Every globe in the Sun's warm white (globe 0) */
+  LAMP_MODE_WHITE,  /**< Every globe in the Sun's built-in warm white */
   LAMP_MODE_OFF,    /**< LED power off; brightness is kept */
 } lamp_mode_t;
 

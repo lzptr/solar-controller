@@ -19,7 +19,8 @@ extern "C" {
 
 typedef enum {
   LAMP_MODE_COLOUR, /**< Each globe in its own colour */
-  LAMP_MODE_WHITE,  /**< Every globe in the white mix */
+  LAMP_MODE_WHITE,  /**< Every globe in the Sun's warm white (globe 0) */
+  LAMP_MODE_OFF,    /**< LED power off; brightness is kept */
 } lamp_mode_t;
 
 typedef enum {
@@ -60,7 +61,7 @@ uint32_t lamp_budget_max_ma(void);
 
 const char *lamp_globe_name(size_t globe);
 led_ring_rgbw_t lamp_globe_color(size_t globe);
-led_ring_rgbw_t lamp_white_color(void);
+const char *lamp_mode_name(lamp_mode_t mode);
 
 /** Stored and sent colour of one LED. */
 esp_err_t lamp_led(size_t index, led_ring_rgbw_t *stored,
@@ -76,11 +77,10 @@ esp_err_t lamp_led(size_t index, led_ring_rgbw_t *stored,
 esp_err_t lamp_set_brightness(uint16_t permille);
 esp_err_t lamp_set_mode(lamp_mode_t mode);
 esp_err_t lamp_set_globe_color(size_t globe, led_ring_rgbw_t color);
-esp_err_t lamp_set_white_color(led_ring_rgbw_t color);
 esp_err_t lamp_set_led_count(size_t count);
 esp_err_t lamp_set_budget_ma(uint32_t budget_ma);
 
-/** Save colours, white mix, LED count and budget. */
+/** Save globe colours, LED count and budget. */
 esp_err_t lamp_save_config(void);
 
 /** Back to the built-in colours, LED count and budget; not saved. */

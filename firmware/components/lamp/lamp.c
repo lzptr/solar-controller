@@ -1,6 +1,7 @@
 #include "lamp.h"
 
 #include <math.h>
+#include <string.h>
 
 #include "board.h"
 #include "driver/gpio.h"
@@ -28,7 +29,7 @@
 #define GUARD_UP 10
 
 #define STATE_VERSION 2
-#define CONFIG_VERSION 1
+#define CONFIG_VERSION 2
 
 static const char *TAG = "lamp";
 
@@ -50,7 +51,6 @@ static const led_ring_rgbw_t DEFAULT_GLOBES[LAMP_GLOBE_COUNT] = {
     {10, 40, 255, 10},  // Neptune
     {120, 70, 50, 60},  // Pluto
 };
-static const led_ring_rgbw_t DEFAULT_WHITE = {0, 0, 0, 255};
 
 typedef enum { POWER_OFF, POWER_RAMPING, POWER_ON } power_state_t;
 
@@ -65,9 +65,17 @@ typedef struct {
   uint8_t version;
   uint8_t led_count;
   uint16_t budget_ma;
-  led_ring_rgbw_t white;
   led_ring_rgbw_t globes[LAMP_GLOBE_COUNT];
 } saved_config_t;
+
+// Version 1 also had a separate white mix; white now uses the Sun's colour.
+typedef struct {
+  uint8_t version;
+  uint8_t led_count;
+  uint16_t budget_ma;
+  led_ring_rgbw_t white;
+  led_ring_rgbw_t globes[LAMP_GLOBE_COUNT];
+} saved_config_v1_t;
 
 static SemaphoreHandle_t lock;
 static nvs_handle_t nvs;
@@ -141,7 +149,7 @@ static void build_scene(void) {
   for (size_t i = 0; i < led_ring_count(); i++) {
     const led_ring_rgbw_t base =
         state.mode == LAMP_MODE_WHITE
-            ? config.white
+            ? config.globes[0]
             : config.globes[(i / LAMP_LEDS_PER_GLOBE) % LAMP_GLOBE_COUNT];
     led_ring_set_pixel(i, scale_color(base, permille));
   }
@@ -159,7 +167,8 @@ static void show(void) {
 static void update(void) {
   const bool want_power =
       fault == LAMP_FAULT_NONE &&
-      (manual ? manual_power : state.brightness > 0);
+      (manual ? manual_power
+              : state.mode != LAMP_MODE_OFF && state.brightness > 0);
 
   if (!want_power && power != POWER_OFF) {
     // Blank the chain while it still has power, then cut it.
@@ -222,6 +231,11 @@ static void handle_input(encoder_event_t event) {
   manual = false;
 
   if (event.steps != 0) {
+    if (state.mode == LAMP_MODE_OFF) {
+      // Turning the knob wakes the lamp.
+      state.mode = LAMP_MODE_COLOUR;
+      mark_state_dirty();
+    }
     const uint16_t brightness = step_brightness(state.brightness, event.steps);
     if (brightness != state.brightness) {
       state.brightness = brightness;
@@ -231,11 +245,16 @@ static void handle_input(encoder_event_t event) {
              state.brightness / 10, state.brightness % 10);
   }
   if (event.pressed) {
-    state.mode =
-        state.mode == LAMP_MODE_COLOUR ? LAMP_MODE_WHITE : LAMP_MODE_COLOUR;
+    // Colour -> white -> off -> colour.
+    state.mode = state.mode == LAMP_MODE_COLOUR  ? LAMP_MODE_WHITE
+                 : state.mode == LAMP_MODE_WHITE ? LAMP_MODE_OFF
+                                                 : LAMP_MODE_COLOUR;
+    if (state.mode != LAMP_MODE_OFF && state.brightness == 0) {
+      // Turned down to 0 with the knob: come back at the lowest step.
+      state.brightness = encoder_steps[0];
+    }
     mark_state_dirty();
-    ESP_LOGI(TAG, "press -> %s",
-             state.mode == LAMP_MODE_WHITE ? "white" : "colour");
+    ESP_LOGI(TAG, "press -> %s", lamp_mode_name(state.mode));
   }
   update();
 }
@@ -323,7 +342,6 @@ static void default_config(void) {
       .budget_ma = CONFIG_LAMP_DEFAULT_BUDGET_MA < budget_max_ma()
                        ? CONFIG_LAMP_DEFAULT_BUDGET_MA
                        : budget_max_ma(),
-      .white = DEFAULT_WHITE,
   };
   for (size_t i = 0; i < LAMP_GLOBE_COUNT; i++) {
     config.globes[i] = DEFAULT_GLOBES[i];
@@ -335,9 +353,27 @@ static bool load_blob(const char *key, void *blob, size_t size) {
   return nvs_get_blob(nvs, key, blob, &stored) == ESP_OK && stored == size;
 }
 
+// Read the saved config, carrying a version 1 blob over without its white
+// mix. The migrated config is written on the next 'save'.
+static bool load_config(void) {
+  if (load_blob("config", &config, sizeof(config))) {
+    return config.version == CONFIG_VERSION;
+  }
+  saved_config_v1_t old;
+  if (!load_blob("config", &old, sizeof(old)) || old.version != 1) {
+    return false;
+  }
+  config = (saved_config_t){
+      .version = CONFIG_VERSION,
+      .led_count = old.led_count,
+      .budget_ma = old.budget_ma,
+  };
+  memcpy(config.globes, old.globes, sizeof(config.globes));
+  return true;
+}
+
 static void load_settings(void) {
-  if (!load_blob("config", &config, sizeof(config)) ||
-      config.version != CONFIG_VERSION || config.led_count < 1 ||
+  if (!load_config() || config.led_count < 1 ||
       config.led_count > led_ring_max_count() ||
       config.budget_ma < LAMP_BUDGET_MIN_MA ||
       config.budget_ma > budget_max_ma()) {
@@ -345,7 +381,7 @@ static void load_settings(void) {
   }
   if (!load_blob("state", &state, sizeof(state)) ||
       state.version != STATE_VERSION || state.brightness > 1000 ||
-      state.mode > LAMP_MODE_WHITE) {
+      state.mode > LAMP_MODE_OFF) {
     state = (saved_state_t){.version = STATE_VERSION};
   }
 }
@@ -379,7 +415,7 @@ esp_err_t lamp_start(void) {
   update();
   ESP_LOGI(TAG, "brightness %u.%u%%, %s, %u LEDs, budget %u mA",
            state.brightness / 10, state.brightness % 10,
-           state.mode == LAMP_MODE_WHITE ? "white" : "colour",
+           lamp_mode_name(state.mode),
            config.led_count, config.budget_ma);
 
   ESP_RETURN_ON_FALSE(xTaskCreate(lamp_task, "lamp", 4096, NULL, 5, NULL) ==
@@ -435,11 +471,16 @@ led_ring_rgbw_t lamp_globe_color(size_t globe) {
   return color;
 }
 
-led_ring_rgbw_t lamp_white_color(void) {
-  xSemaphoreTake(lock, portMAX_DELAY);
-  const led_ring_rgbw_t color = config.white;
-  xSemaphoreGive(lock);
-  return color;
+const char *lamp_mode_name(lamp_mode_t mode) {
+  switch (mode) {
+  case LAMP_MODE_COLOUR:
+    return "colour";
+  case LAMP_MODE_WHITE:
+    return "white";
+  case LAMP_MODE_OFF:
+    return "off";
+  }
+  return "?";
 }
 
 esp_err_t lamp_led(size_t index, led_ring_rgbw_t *stored,
@@ -467,8 +508,8 @@ esp_err_t lamp_set_brightness(uint16_t permille) {
 }
 
 esp_err_t lamp_set_mode(lamp_mode_t mode) {
-  ESP_RETURN_ON_FALSE(mode == LAMP_MODE_COLOUR || mode == LAMP_MODE_WHITE,
-                      ESP_ERR_INVALID_ARG, TAG, "invalid mode");
+  ESP_RETURN_ON_FALSE(mode <= LAMP_MODE_OFF, ESP_ERR_INVALID_ARG, TAG,
+                      "invalid mode");
   xSemaphoreTake(lock, portMAX_DELAY);
   manual = false;
   state.mode = mode;
@@ -484,15 +525,6 @@ esp_err_t lamp_set_globe_color(size_t globe, led_ring_rgbw_t color) {
   xSemaphoreTake(lock, portMAX_DELAY);
   manual = false;
   config.globes[globe] = color;
-  update();
-  xSemaphoreGive(lock);
-  return ESP_OK;
-}
-
-esp_err_t lamp_set_white_color(led_ring_rgbw_t color) {
-  xSemaphoreTake(lock, portMAX_DELAY);
-  manual = false;
-  config.white = color;
   update();
   xSemaphoreGive(lock);
   return ESP_OK;

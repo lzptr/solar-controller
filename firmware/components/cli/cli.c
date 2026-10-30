@@ -68,7 +68,7 @@ static void print_status(void) {
   lamp_status_t s;
   lamp_get_status(&s);
   print_permille("lamp    brightness ", s.brightness_permille);
-  printf("  %s  %s\n", s.mode == LAMP_MODE_WHITE ? "white" : "colour",
+  printf("  %s  %s\n", lamp_mode_name(s.mode),
          s.manual ? "MANUAL (type 'scene' to leave)" : "scene");
   printf("power   EN %s%s  FLT %s  fault: %s\n",
          s.power_enabled ? "on" : "off", s.power_ramping ? " (ramping)" : "",
@@ -122,6 +122,9 @@ static int cmd_mode(int argc, char **argv) {
   if (strcmp(argv[1], "white") == 0) {
     return finish(lamp_set_mode(LAMP_MODE_WHITE));
   }
+  if (strcmp(argv[1], "off") == 0) {
+    return finish(lamp_set_mode(LAMP_MODE_OFF));
+  }
   return usage(argv[0]);
 }
 
@@ -143,19 +146,6 @@ static int cmd_globe(int argc, char **argv) {
     print_globe(globe);
   }
   return finish(error);
-}
-
-static int cmd_white(int argc, char **argv) {
-  led_ring_rgbw_t color;
-  if (argc == 1) {
-    print_color("white ", lamp_white_color());
-    printf("\n");
-    return 0;
-  }
-  if (argc != 5 || !parse_color(&argv[1], &color)) {
-    return usage(argv[0]);
-  }
-  return finish(lamp_set_white_color(color));
 }
 
 static int cmd_count(int argc, char **argv) {
@@ -187,7 +177,7 @@ static int cmd_save(int argc, char **argv) {
     printf("save failed: %s\n", esp_err_to_name(error));
     return 1;
   }
-  printf("saved colours, white mix, LED count and budget\n");
+  printf("saved globe colours, LED count and budget\n");
   return 0;
 }
 
@@ -309,19 +299,19 @@ static const command_t COMMANDS[] = {
     {"bright", "<0-100>",
      "Set the brightness in percent, 0 = off (eFuse off); saved after 3 s",
      cmd_bright},
-    {"mode", "colour|white", "Planet colours or the white mix; saved after 3 s",
+    {"mode", "colour|white|off",
+     "Planet colours, every globe in the Sun's warm white, or off (keeps "
+     "brightness); the button cycles them; saved after 3 s",
      cmd_mode},
     {"globe", "[<0-9> <r> <g> <b> <w>]",
-     "List the globe colours, or set one (0 = Sun ... 9 = Pluto); 'save' "
-     "keeps it",
+     "List the globe colours, or set one (0 = Sun, also used for white mode "
+     "... 9 = Pluto); 'save' keeps it",
      cmd_globe},
-    {"white", "[<r> <g> <b> <w>]",
-     "Show or set the white-mode mix; 'save' keeps it", cmd_white},
     {"count", "<1-" STR(CONFIG_BSP_LED_MAX) ">",
      "LEDs on the chain, 7 per globe; 'save' keeps it", cmd_count},
     {"budget", "<mA>",
      "LED current budget incl. idle current; 'save' keeps it", cmd_budget},
-    {"save", NULL, "Save colours, white mix, LED count and budget to flash",
+    {"save", NULL, "Save globe colours, LED count and budget to flash",
      cmd_save},
     {"defaults", NULL,
      "Restore built-in colours, LED count and budget (not saved)",

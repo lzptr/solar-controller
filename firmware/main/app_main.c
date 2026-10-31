@@ -2,12 +2,12 @@
 
 #include "esp_log.h"
 
-#include "led_cli.h"
-#include "led_ring.h"
+#include "cli.h"
+#include "lamp.h"
 
 void app_main(void) {
   ESP_ERROR_CHECK(board_init());
-  ESP_ERROR_CHECK(led_ring_init());
-  ESP_LOGI("app", "SK6812 ring test ready; type 'help' for commands");
-  ESP_ERROR_CHECK(led_cli_start());
+  ESP_ERROR_CHECK(lamp_start());
+  ESP_LOGI("app", "Solar controller ready; type 'help' for commands");
+  ESP_ERROR_CHECK(cli_start());
 }

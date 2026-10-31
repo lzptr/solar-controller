@@ -1,13 +1,16 @@
 menu "LED ring"
 
-config LED_RING_BOOT_WHITE
-    int "Power-up white level (0-255)"
-    range 0 255
-    default 255
+config LED_RING_CHANNEL_FULL_UA
+    int "Current of one SK6812 colour channel at 255 (uA)"
+    range 1000 30000
+    default 16000
+    help
+        Used to estimate the chain current for the limiter. Err on the high
+        side; the measured-current guard corrects an underestimate.
 
-config LED_RING_BOOT_BRIGHTNESS
-    int "Power-up brightness (%)"
-    range 0 100
-    default 20
+config LED_RING_IDLE_UA
+    int "Idle current of one SK6812 (uA)"
+    range 0 5000
+    default 1000
 
 endmenu

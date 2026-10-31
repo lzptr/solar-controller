@@ -1,0 +1,35 @@
+menu "Lamp"
+
+config LAMP_ENCODER_STEPS
+    int "Encoder detents from off to full brightness"
+    range 2 100
+    default 30
+    help
+        30 is one full turn of the EC11. The steps rise in equal ratios from
+        LAMP_MIN_BRIGHTNESS_PERMILLE to 100 %, so each one looks about as big.
+
+config LAMP_MIN_BRIGHTNESS_PERMILLE
+    int "Brightness of the first encoder step (permille of full)"
+    range 1 1000
+    default 20
+    help
+        SK6812 channels are 8 bit, so much lower makes dim colours drop out.
+
+config LAMP_DEFAULT_BUDGET_MA
+    int "Default LED current budget (mA)"
+    range 50 2000
+    default 1600
+    help
+        The highest budget allowed, so the full chain can reach full
+        brightness (70 LEDs at full white take about 1.2 A). A laptop USB port
+        may not supply that; lower it with 'budget', e.g. 400. Capped 200 mA
+        below LAMP_OVERCURRENT_MA.
+
+config LAMP_OVERCURRENT_MA
+    int "Measured LED current that latches LED power off (mA)"
+    range 300 2200
+    default 1800
+    help
+        Just under U402's 2.04 A limit. The budget is capped 200 mA below.
+
+endmenu

@@ -31,16 +31,8 @@ log/
 *assets/*
 *.DS_Store
 
-# ESP-IDF generated files
-firmware/build/
-firmware/test/build/
-firmware/sdkconfig
-firmware/sdkconfig.old
-firmware/test/sdkconfig
-firmware/test/sdkconfig.old
-
-# ESP-IDF downloaded managed dependencies
-firmware/managed_components/
-firmware/test/managed_components/
+# ESPHome build output and secrets
+firmware/.esphome/
+firmware/secrets.yaml
 
 output/**

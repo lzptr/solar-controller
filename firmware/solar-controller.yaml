@@ -1,0 +1,492 @@
+# Solar controller rev 0.1: ESP32-C6-MINI-1U-H4 driving a chain of 10 lithophane
+# globes (Sun + 9 planets, 7 SK6812 RGBW LEDs each) through a TPS259531 eFuse.
+#
+#   GPIO0  ILM   eFuse current monitor, 276 mV/A (ADC1_CH0)
+#   GPIO1  FLT   eFuse fault, open drain, low on thermal shutdown (R404 pull-up)
+#   GPIO2  ENC_B encoder B (2k2 pull-up)
+#   GPIO3  ENC_A encoder A (2k2 pull-up)
+#   GPIO5  EN    eFuse enable, high = LED 5 V on
+#   GPIO6  SW    encoder push, active low (10k pull-up)
+#   GPIO7  DATA  SK6812 data through the SN74LVC1T45 on the switched 5 V
+#   GPIO19 D301  status LED
+#
+# Build and flash from this folder: esphome run solar-controller.yaml
+
+substitutions:
+  led_count: "70" # 10 globes x 7 LEDs
+  ilm_mv_per_a: "276"
+  channel_full_ma: "16" # SK6812 per colour channel at 255
+  idle_ma: "1" # SK6812 quiescent
+  overcurrent_ma: "1800" # eFuse limits at about 2.04 A
+  min_brightness: "0.02" # lowest encoder step; one step below turns off
+  encoder_steps: "30"
+
+esphome:
+  name: solar-controller
+  friendly_name: Solar Chain
+  comment: Solar system lamp controller rev 0.1
+  on_boot:
+    priority: -100
+    then:
+      # First boot only: start in Planets at 30 %. Afterwards the light restores
+      # its own state, including brightness and effect.
+      - if:
+          condition:
+            lambda: return !id(configured);
+          then:
+            - light.turn_on:
+                id: chain
+                brightness: 30%
+                effect: Planets
+            - globals.set:
+                id: configured
+                value: "true"
+
+esp32:
+  variant: esp32c6
+  board: esp32-c6-devkitc-1
+  flash_size: 4MB
+  framework:
+    type: esp-idf
+
+logger:
+  logs:
+    adc: INFO
+    sensor: INFO
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: Solar Chain Fallback
+    password: !secret fallback_ap_password
+
+captive_portal:
+
+packages:
+  sun: !include
+    file: globe.yaml
+    vars: {index: 0, planet: Sun, cb: 1, r: 1, g: 0.4314, b: 0, w: 0.2353} # {255, 110, 0, 60}
+  mercury: !include
+    file: globe.yaml
+    vars: {index: 1, planet: Mercury, cb: 0.1569, r: 1, g: 0.75, b: 0.5, w: 0.4706} # {40, 30, 20, 120}
+  venus: !include
+    file: globe.yaml
+    vars: {index: 2, planet: Venus, cb: 0.6275, r: 1, g: 0.6875, b: 0.125, w: 0.2353} # {160, 110, 20, 60}
+  earth: !include
+    file: globe.yaml
+    vars: {index: 3, planet: Earth, cb: 0.7843, r: 0, g: 0.3, b: 1, w: 0.1569} # {0, 60, 200, 40}
+  mars: !include
+    file: globe.yaml
+    vars: {index: 4, planet: Mars, cb: 0.8627, r: 1, g: 0.2273, b: 0.0455, w: 0.0392} # {220, 50, 10, 10}
+  jupiter: !include
+    file: globe.yaml
+    vars: {index: 5, planet: Jupiter, cb: 0.7843, r: 1, g: 0.5, b: 0.15, w: 0.2353} # {200, 100, 30, 60}
+  saturn: !include
+    file: globe.yaml
+    vars: {index: 6, planet: Saturn, cb: 0.7059, r: 1, g: 0.7222, b: 0.2222, w: 0.3137} # {180, 130, 40, 80}
+  uranus: !include
+    file: globe.yaml
+    vars: {index: 7, planet: Uranus, cb: 0.6667, r: 0.1176, g: 0.9412, b: 1, w: 0.1176} # {20, 160, 170, 30}
+  neptune: !include
+    file: globe.yaml
+    vars: {index: 8, planet: Neptune, cb: 1, r: 0.0392, g: 0.1569, b: 1, w: 0.0392} # {10, 40, 255, 10}
+  pluto: !include
+    file: globe.yaml
+    vars: {index: 9, planet: Pluto, cb: 0.4706, r: 1, g: 0.5833, b: 0.4167, w: 0.2353} # {120, 70, 50, 60}
+
+globals:
+  # Per-globe RGBW, 0-1, written by the globe lights in globe.yaml.
+  - id: globe_colour
+    type: std::array<float, 40>
+  - id: configured
+    type: bool
+    restore_value: true
+    initial_value: "false"
+  # 0 none, 1 eFuse thermal shutdown, 2 overcurrent. Latched until cleared.
+  - id: fault
+    type: int
+    initial_value: "0"
+  - id: overcurrent_samples
+    type: int
+    initial_value: "0"
+  # Output scale from the budget estimate, capped by the measured guard.
+  - id: limit_scale
+    type: float
+    initial_value: "1.0"
+  - id: guard
+    type: float
+    initial_value: "1.0"
+  - id: measured_ma
+    type: float
+    initial_value: "0"
+  - id: estimated_ma
+    type: float
+    initial_value: "0"
+  # Set when the encoder dimmed the light off, so turning back up starts low.
+  - id: dimmed_off
+    type: bool
+    initial_value: "false"
+
+power_supply:
+  - id: led_power
+    pin: GPIO5
+    # C403 ramps the 5 V at about 0.42 V/ms.
+    enable_time: 50ms
+    keep_on_time: 100ms
+
+output:
+  - platform: gpio
+    id: status_out
+    pin: GPIO19
+
+light:
+  - platform: esp32_rmt_led_strip
+    id: chain
+    output_id: strip
+    name: None
+    icon: mdi:orbit
+    pin: GPIO7
+    num_leds: ${led_count}
+    chipset: SK6812
+    is_rgbw: true
+    rgb_order: GRB
+    power_supply: led_power
+    # Linear output, so colours match the values in the globe table.
+    gamma_correct: 1.0
+    default_transition_length: 300ms
+    restore_mode: RESTORE_DEFAULT_ON
+    resume_effect: true
+    initial_state:
+      brightness: 30%
+    on_turn_on:
+      - if:
+          condition:
+            lambda: return id(fault) != 0;
+          then:
+            - logger.log:
+                level: WARN
+                format: "Fault latched; clear it first"
+            - light.turn_off:
+                id: chain
+                transition_length: 0s
+    effects:
+      - addressable_lambda:
+          name: Planets
+          update_interval: 50ms
+          lambda: |-
+            const auto &colour = id(globe_colour);
+            for (int i = 0; i < it.size(); i++) {
+              const int globe = i / 7;
+              if (globe >= 10) {
+                it[i] = Color::BLACK;
+                continue;
+              }
+              const float *c = &colour[globe * 4];
+              it[i] = Color(lroundf(c[0] * 255), lroundf(c[1] * 255),
+                            lroundf(c[2] * 255), lroundf(c[3] * 255));
+            }
+
+sensor:
+  - platform: adc
+    id: ilm_voltage
+    pin: GPIO0
+    attenuation: 2.5db
+    samples: 8
+    update_interval: 100ms
+    internal: true
+  - platform: rotary_encoder
+    id: knob
+    pin_a: GPIO3
+    pin_b: GPIO2
+    # EC11J1525402: 15 pulses, 30 detents per turn, so one count per detent.
+    resolution: 2
+    internal: true
+    on_clockwise:
+      - script.execute:
+          id: step_brightness
+          direction: 1
+    on_anticlockwise:
+      - script.execute:
+          id: step_brightness
+          direction: -1
+  - platform: template
+    name: LED current
+    unit_of_measurement: mA
+    device_class: current
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: 2s
+    lambda: return id(measured_ma);
+  - platform: template
+    name: Estimated LED current
+    unit_of_measurement: mA
+    device_class: current
+    state_class: measurement
+    accuracy_decimals: 0
+    entity_category: diagnostic
+    update_interval: 2s
+    lambda: return id(estimated_ma);
+  - platform: template
+    name: Current limiter
+    unit_of_measurement: "%"
+    icon: mdi:speedometer-slow
+    accuracy_decimals: 0
+    entity_category: diagnostic
+    update_interval: 2s
+    lambda: return id(limit_scale) * 100.0f;
+  - platform: wifi_signal
+    name: Wi-Fi signal
+    update_interval: 60s
+
+binary_sensor:
+  - platform: gpio
+    id: efuse_flt
+    name: eFuse FLT
+    device_class: problem
+    entity_category: diagnostic
+    pin:
+      number: GPIO1
+      inverted: true
+    on_press:
+      # FLT only means something while the eFuse is enabled.
+      - if:
+          condition:
+            lambda: return id(led_power).is_enabled();
+          then:
+            - script.execute:
+                id: trip
+                reason: 1
+  - platform: gpio
+    id: knob_button
+    pin:
+      number: GPIO6
+      inverted: true
+    internal: true
+    filters:
+      - delayed_on_off: 20ms
+    on_click:
+      # Long presses are reserved.
+      min_length: 20ms
+      max_length: 800ms
+      then:
+        - script.execute: cycle_mode
+  - platform: template
+    name: LED power
+    device_class: power
+    lambda: return id(led_power).is_enabled();
+
+text_sensor:
+  - platform: template
+    id: fault_text
+    name: Fault
+    icon: mdi:alert-circle-outline
+    update_interval: never
+    lambda: return {"None"};
+
+number:
+  - platform: template
+    id: budget
+    name: Current budget
+    icon: mdi:current-dc
+    unit_of_measurement: mA
+    min_value: 50
+    max_value: 1600 # ${overcurrent_ma} minus headroom
+    step: 50
+    initial_value: 1600
+    optimistic: true
+    restore_value: true
+    mode: box
+    entity_category: config
+  - platform: template
+    id: connected_leds
+    name: Connected LEDs
+    icon: mdi:led-strip
+    min_value: 1
+    max_value: ${led_count}
+    step: 1
+    initial_value: ${led_count}
+    optimistic: true
+    restore_value: true
+    mode: box
+    entity_category: config
+
+button:
+  - platform: template
+    name: Clear fault
+    icon: mdi:restore-alert
+    entity_category: config
+    on_press:
+      - script.execute: clear_fault
+  - platform: restart
+    name: Restart
+
+script:
+  - id: trip
+    parameters:
+      reason: int
+    then:
+      - lambda: |-
+          if (id(fault) != 0)
+            return;
+          id(fault) = reason;
+          const char *name = reason == 1 ? "eFuse thermal shutdown (FLT)" : "Overcurrent";
+          ESP_LOGE("lamp", "fault: %s at %.0f mA, LEDs off", name, id(measured_ma));
+          id(fault_text).publish_state(name);
+      - light.turn_off:
+          id: chain
+          transition_length: 0s
+
+  - id: clear_fault
+    then:
+      - lambda: |-
+          if (id(fault) == 0)
+            return;
+          ESP_LOGW("lamp", "fault cleared");
+          id(fault) = 0;
+          id(overcurrent_samples) = 0;
+          id(guard) = 1.0f;
+          id(fault_text).publish_state("None");
+
+  # Encoder: perceptual steps (equal ratios) from min_brightness to 100 %. One step
+  # below the lowest turns the light off; turning up from off starts in Planets.
+  - id: step_brightness
+    mode: queued
+    max_runs: 16
+    parameters:
+      direction: int
+    then:
+      - script.execute: clear_fault
+      - lambda: |-
+          const int steps = ${encoder_steps};
+          const float lowest = ${min_brightness};
+          auto *lamp = id(chain);
+          const float now = lamp->remote_values.get_brightness();
+
+          if (!lamp->remote_values.is_on()) {
+            if (direction < 0)
+              return;
+            const float start = id(dimmed_off) ? lowest : std::max(now, lowest);
+            id(dimmed_off) = false;
+            lamp->turn_on().set_brightness(start).set_effect("Planets").perform();
+            ESP_LOGI("knob", "on, Planets at %.1f %%", start * 100);
+            return;
+          }
+
+          float next = -1;
+          for (int i = 0; i < steps; i++) {
+            const int k = direction > 0 ? i : steps - 1 - i;
+            const float stop = lowest * powf(1.0f / lowest, k / float(steps - 1));
+            if (direction > 0 ? stop > now * 1.001f : stop < now * 0.999f) {
+              next = stop;
+              break;
+            }
+          }
+          if (next < 0 && direction > 0)
+            next = 1.0f;
+          if (next < 0) {
+            id(dimmed_off) = true;
+            lamp->turn_off().perform();
+            ESP_LOGI("knob", "off");
+            return;
+          }
+          lamp->turn_on().set_brightness(next).set_transition_length(80).perform();
+          ESP_LOGI("knob", "%+d -> %.1f %%", direction, next * 100);
+
+  # Encoder press: Planets -> warm white -> off -> Planets.
+  - id: cycle_mode
+    then:
+      - script.execute: clear_fault
+      - lambda: |-
+          auto *lamp = id(chain);
+          id(dimmed_off) = false;
+          if (!lamp->remote_values.is_on()) {
+            auto call = lamp->turn_on().set_effect("Planets");
+            if (lamp->remote_values.get_brightness() < ${min_brightness})
+              call.set_brightness(${min_brightness});
+            call.perform();
+            ESP_LOGI("knob", "press -> Planets");
+          } else if (lamp->get_current_effect_index() == lamp->get_effect_index("Planets")) {
+            // The Sun's colour, {255, 110, 0, 60}, on every globe.
+            lamp->turn_on()
+                .set_effect("None")
+                .set_color_mode(light::ColorMode::RGB_WHITE)
+                .set_color_brightness(1.0f)
+                .set_rgb(1.0f, 110 / 255.0f, 0.0f)
+                .set_white(60 / 255.0f)
+                .perform();
+            ESP_LOGI("knob", "press -> warm white");
+          } else {
+            lamp->turn_off().perform();
+            ESP_LOGI("knob", "press -> off");
+          }
+
+interval:
+  # Current: budget estimate plus measured guard, and overcurrent trip.
+  - interval: 100ms
+    then:
+      - lambda: |-
+          const float volts = id(ilm_voltage).state;
+          if (!std::isnan(volts)) {
+            const float ma = volts * 1e6f / ${ilm_mv_per_a};
+            id(measured_ma) = ma;
+            if (ma >= ${overcurrent_ma}) {
+              if (++id(overcurrent_samples) >= 3)
+                id(trip).execute(2);
+            } else {
+              id(overcurrent_samples) = 0;
+            }
+            const float limit = id(budget).state;
+            if (id(led_power).is_enabled() && ma > limit * 1.10f)
+              id(guard) = std::max(0.05f, id(guard) - 0.05f);
+            else if (ma < limit * 0.95f)
+              id(guard) = std::min(1.0f, id(guard) + 0.01f);
+          }
+
+          // Estimate from what is on the wire, undo the current scale to get
+          // what the light asks for, then fit that into the budget.
+          auto *leds = id(strip);
+          const int count = std::min<int>(id(connected_leds).state, leds->size());
+          uint32_t raw = 0;
+          for (int i = 0; i < count; i++) {
+            auto c = (*leds)[i];
+            raw += c.get_red_raw() + c.get_green_raw() + c.get_blue_raw() + c.get_white_raw();
+          }
+          const float active = raw * float(${channel_full_ma}) / 255.0f;
+          const float wanted = id(limit_scale) > 0.01f ? active / id(limit_scale) : active;
+          const float idle = count * float(${idle_ma});
+          const float room = std::max(0.0f, id(budget).state - idle);
+          const float fit = wanted > room ? room / wanted : 1.0f;
+          const float scale = std::min(fit, id(guard));
+          id(estimated_ma) = idle + wanted * scale;
+
+          if (fabsf(scale - id(limit_scale)) > 0.005f) {
+            id(limit_scale) = scale;
+            leds->set_correction(scale, scale, scale, scale);
+            // Effects repaint on their own; a plain colour needs a redraw.
+            if (!id(chain).is_transformer_active())
+              leds->update_state(id(chain));
+          }
+
+  # Status LED: fast blink on a fault, short flash each second until Home
+  # Assistant connects, otherwise on while the LED supply is on.
+  - interval: 50ms
+    then:
+      - lambda: |-
+          const uint32_t t = millis();
+          bool on;
+          if (id(fault) != 0)
+            on = (t / 100) % 2 == 0;
+          else if (!api::global_api_server->is_connected())
+            on = t % 1000 < 100;
+          else
+            on = id(led_power).is_enabled();
+          id(status_out).set_state(on);

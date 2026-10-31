@@ -6644,7 +6644,7 @@
 				)
 			)
 		)
-		(property "Description" "RF module, ESP32-C6-MINI-1U (U.FL antenna connector), Wi-Fi 6, BLE 5, 802.15.4, 3.3 V"
+		(property "Description" "RF module, ESP32-C6-MINI-1U (W.FL / I-PEX MHF III antenna connector, not U.FL), Wi-Fi 6, BLE 5, 802.15.4, 3.3 V"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -14525,7 +14525,7 @@
 			(justify left)
 		)
 	)
-	(gr_text "ESP32-C6-MINI-1U: no PCB antenna, U.FL socket left unused"
+	(gr_text "ESP32-C6-MINI-1U: no PCB antenna, needs external 2.4 GHz antenna on W.FL / MHF III socket (not U.FL)"
 		(at 168 81.6 0)
 		(layer "Cmts.User")
 		(uuid "766a7881-a416-4ab5-bd92-fc93862400fa")

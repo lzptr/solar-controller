@@ -7815,7 +7815,7 @@
 				)
 			)
 		)
-		(property "Description" "RF module, ESP32-C6-MINI-1U (U.FL antenna connector), Wi-Fi 6, BLE 5, 802.15.4, 3.3 V"
+		(property "Description" "RF module, ESP32-C6-MINI-1U (W.FL / I-PEX MHF III antenna connector, not U.FL), Wi-Fi 6, BLE 5, 802.15.4, 3.3 V"
 			(at 87.63 80.01 0)
 			(hide yes)
 			(show_name no)

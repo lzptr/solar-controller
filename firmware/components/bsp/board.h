@@ -13,7 +13,7 @@ extern "C" {
  * ESP32-C6-MINI-1U-H4. Net names are the schematic's.
  */
 
-/** MCU_LDATA: SK6812 data through U403, which is powered from the switched
+/** MCU_LDATA: LED data through U403, which is powered from the switched
  *  +5V, so data only reaches J401 while LED power is on. */
 #define BOARD_GPIO_LED_DATA GPIO_NUM_7
 
@@ -41,7 +41,7 @@ extern "C" {
 /** LED_ACT: status LED D301, high = on. */
 #define BOARD_GPIO_STATUS_LED GPIO_NUM_19
 
-/** SK6812 RGBW LEDs the data line is sized for. */
+/** LEDs the data line is sized for. */
 #define BOARD_LED_MAX CONFIG_BSP_LED_MAX
 
 /**

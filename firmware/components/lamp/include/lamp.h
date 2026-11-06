@@ -6,20 +6,29 @@
 
 #include "esp_err.h"
 #include "led_ring.h"
+#include "sdkconfig.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/*
+ * Two build variants: the planet globes, each in its own colour, and with
+ * CONFIG_LAMP_VARIANT_STRIP an RGB LED strip that only shows one warm white.
+ */
+
+#if !CONFIG_LAMP_VARIANT_STRIP
 /** Sun, Mercury ... Neptune, Pluto, in chain order from the controller. */
 #define LAMP_GLOBE_COUNT 10
 #define LAMP_LEDS_PER_GLOBE 7
+#endif
 
 #define LAMP_BUDGET_MIN_MA 50
 
 typedef enum {
-  LAMP_MODE_COLOUR, /**< Each globe in its own colour */
-  LAMP_MODE_WHITE,  /**< Every globe in the Sun's built-in warm white */
+  LAMP_MODE_COLOUR, /**< Each globe in its own colour; globes only */
+  LAMP_MODE_WHITE,  /**< Warm white: the Sun's built-in colour on the globes,
+                         the white mix on the strip, where this is "on" */
   LAMP_MODE_OFF,    /**< LED power off; brightness is kept */
 } lamp_mode_t;
 
@@ -59,8 +68,13 @@ void lamp_get_status(lamp_status_t *status);
 const char *lamp_fault_name(lamp_fault_t fault);
 uint32_t lamp_budget_max_ma(void);
 
+#if CONFIG_LAMP_VARIANT_STRIP
+/** Warm white mix of the strip; W is not used. */
+led_ring_rgbw_t lamp_white(void);
+#else
 const char *lamp_globe_name(size_t globe);
 led_ring_rgbw_t lamp_globe_color(size_t globe);
+#endif
 const char *lamp_mode_name(lamp_mode_t mode);
 
 /** Stored and sent colour of one LED. */
@@ -75,12 +89,17 @@ esp_err_t lamp_led(size_t index, led_ring_rgbw_t *stored,
 
 /** 0-1000 permille of full; 0 switches LED power off. */
 esp_err_t lamp_set_brightness(uint16_t permille);
+/** The strip only takes white and off. */
 esp_err_t lamp_set_mode(lamp_mode_t mode);
+#if CONFIG_LAMP_VARIANT_STRIP
+esp_err_t lamp_set_white(led_ring_rgbw_t color);
+#else
 esp_err_t lamp_set_globe_color(size_t globe, led_ring_rgbw_t color);
+#endif
 esp_err_t lamp_set_led_count(size_t count);
 esp_err_t lamp_set_budget_ma(uint32_t budget_ma);
 
-/** Save globe colours, LED count and budget. */
+/** Save the globe colours or white mix, LED count and budget. */
 esp_err_t lamp_save_config(void);
 
 /** Back to the built-in colours, LED count and budget; not saved. */

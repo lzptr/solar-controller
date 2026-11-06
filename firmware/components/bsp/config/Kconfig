@@ -1,11 +1,13 @@
 menu "Board"
 
 config BSP_LED_MAX
-    int "SK6812 RGBW LEDs the data line is sized for"
+    int "LEDs the data line is sized for"
     range 1 128
+    default 60 if LAMP_VARIANT_STRIP
     default 70
     help
-        Frame buffer size. Ten globes with a seven-LED ring each. The number
-        actually connected is set at runtime with the 'count' command.
+        Frame buffer size. Ten globes with a seven-LED ring each, or one
+        metre of strip with 60 LEDs/m. The number actually connected is set
+        at runtime with the 'count' command.
 
 endmenu

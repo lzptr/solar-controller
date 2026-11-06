@@ -22,6 +22,19 @@
 #define STR_(x) #x
 #define STR(x) STR_(x)
 
+// The strip has no white channel, so its colours take three values.
+#if CONFIG_LAMP_VARIANT_STRIP
+#define CHANNELS 3
+#define COLOR_HINT "<r> <g> <b>"
+#define FILL_COMMAND "rgb"
+#define SAVED_SETTINGS "white mix, LED count and budget"
+#else
+#define CHANNELS 4
+#define COLOR_HINT "<r> <g> <b> <w>"
+#define FILL_COMMAND "rgbw"
+#define SAVED_SETTINGS "globe colours, LED count and budget"
+#endif
+
 static const char *TAG = "cli";
 static bool started;
 
@@ -42,8 +55,8 @@ static bool parse_uint(const char *text, unsigned long max,
 }
 
 static bool parse_color(char **argv, led_ring_rgbw_t *color) {
-  uint8_t v[4];
-  for (size_t i = 0; i < 4; i++) {
+  uint8_t v[4] = {0};
+  for (size_t i = 0; i < CHANNELS; i++) {
     unsigned long parsed;
     if (!parse_uint(argv[i], 255, &parsed)) {
       printf("invalid channel value '%s' (0-255)\n", argv[i]);
@@ -56,8 +69,10 @@ static bool parse_color(char **argv, led_ring_rgbw_t *color) {
 }
 
 static void print_color(const char *label, led_ring_rgbw_t color) {
-  printf("%sR=%3u G=%3u B=%3u W=%3u", label, color.r, color.g, color.b,
-         color.w);
+  printf("%sR=%3u G=%3u B=%3u", label, color.r, color.g, color.b);
+#if CHANNELS == 4
+  printf(" W=%3u", color.w);
+#endif
 }
 
 static void print_permille(const char *label, unsigned permille) {
@@ -90,11 +105,18 @@ static int finish(esp_err_t error) {
   return 0;
 }
 
+#if CONFIG_LAMP_VARIANT_STRIP
+static void print_white(void) {
+  print_color("white ", lamp_white());
+  printf("\n");
+}
+#else
 static void print_globe(size_t globe) {
   printf("%u %-8s ", (unsigned)globe, lamp_globe_name(globe));
   print_color("", lamp_globe_color(globe));
   printf("\n");
 }
+#endif
 
 static int cmd_status(int argc, char **argv) {
   if (argc != 1) {
@@ -116,18 +138,41 @@ static int cmd_mode(int argc, char **argv) {
   if (argc != 2) {
     return usage(argv[0]);
   }
+#if CONFIG_LAMP_VARIANT_STRIP
+  if (strcmp(argv[1], "on") == 0) {
+    return finish(lamp_set_mode(LAMP_MODE_WHITE));
+  }
+#else
   if (strcmp(argv[1], "colour") == 0 || strcmp(argv[1], "color") == 0) {
     return finish(lamp_set_mode(LAMP_MODE_COLOUR));
   }
   if (strcmp(argv[1], "white") == 0) {
     return finish(lamp_set_mode(LAMP_MODE_WHITE));
   }
+#endif
   if (strcmp(argv[1], "off") == 0) {
     return finish(lamp_set_mode(LAMP_MODE_OFF));
   }
   return usage(argv[0]);
 }
 
+#if CONFIG_LAMP_VARIANT_STRIP
+static int cmd_white(int argc, char **argv) {
+  if (argc == 1) {
+    print_white();
+    return 0;
+  }
+  led_ring_rgbw_t color;
+  if (argc != 1 + CHANNELS || !parse_color(&argv[1], &color)) {
+    return usage(argv[0]);
+  }
+  const esp_err_t error = lamp_set_white(color);
+  if (error == ESP_OK) {
+    print_white();
+  }
+  return finish(error);
+}
+#else
 static int cmd_globe(int argc, char **argv) {
   if (argc == 1) {
     for (size_t i = 0; i < LAMP_GLOBE_COUNT; i++) {
@@ -147,6 +192,7 @@ static int cmd_globe(int argc, char **argv) {
   }
   return finish(error);
 }
+#endif
 
 static int cmd_count(int argc, char **argv) {
   unsigned long count;
@@ -177,7 +223,7 @@ static int cmd_save(int argc, char **argv) {
     printf("save failed: %s\n", esp_err_to_name(error));
     return 1;
   }
-  printf("saved globe colours, LED count and budget\n");
+  printf("saved " SAVED_SETTINGS "\n");
   return 0;
 }
 
@@ -186,8 +232,7 @@ static int cmd_defaults(int argc, char **argv) {
     return usage(argv[0]);
   }
   lamp_restore_defaults();
-  printf("built-in colours, LED count and budget restored; 'save' keeps "
-         "them\n");
+  printf("built-in " SAVED_SETTINGS " restored; 'save' keeps them\n");
   return finish(ESP_OK);
 }
 
@@ -220,8 +265,12 @@ static int cmd_leds(int argc, char **argv) {
   led_ring_rgbw_t stored;
   led_ring_rgbw_t sent;
   for (size_t i = 0; lamp_led(i, &stored, &sent) == ESP_OK; i++) {
+#if CONFIG_LAMP_VARIANT_STRIP
+    printf("%3u ", (unsigned)i);
+#else
     printf("%2u %-8s ", (unsigned)i,
            lamp_globe_name(i / LAMP_LEDS_PER_GLOBE % LAMP_GLOBE_COUNT));
+#endif
     print_color("", stored);
     print_color("  sent ", sent);
     printf("\n");
@@ -231,7 +280,7 @@ static int cmd_leds(int argc, char **argv) {
 
 static int cmd_rgbw(int argc, char **argv) {
   led_ring_rgbw_t color;
-  if (argc != 5 || !parse_color(&argv[1], &color)) {
+  if (argc != 1 + CHANNELS || !parse_color(&argv[1], &color)) {
     return usage(argv[0]);
   }
   return finish(lamp_manual_fill(color));
@@ -241,7 +290,7 @@ static int cmd_pixel(int argc, char **argv) {
   lamp_status_t s;
   lamp_get_status(&s);
   unsigned long index;
-  if (argc != 6) {
+  if (argc != 2 + CHANNELS) {
     return usage(argv[0]);
   }
   if (!parse_uint(argv[1], s.led_count - 1, &index)) {
@@ -299,29 +348,38 @@ static const command_t COMMANDS[] = {
     {"bright", "<0-100>",
      "Set the brightness in percent, 0 = off (eFuse off); saved after 3 s",
      cmd_bright},
+#if CONFIG_LAMP_VARIANT_STRIP
+    {"mode", "on|off",
+     "Switch the strip on or off (keeps brightness); the button toggles it; "
+     "saved after 3 s",
+     cmd_mode},
+    {"white", "[" COLOR_HINT "]",
+     "Show the warm white mix, or set it; 'save' keeps it", cmd_white},
+    {"count", "<1-" STR(CONFIG_BSP_LED_MAX) ">",
+     "LEDs on the strip; 'save' keeps it", cmd_count},
+#else
     {"mode", "colour|white|off",
      "Planet colours, every globe in the Sun's warm white, or off (keeps "
      "brightness); the button cycles them; saved after 3 s",
      cmd_mode},
-    {"globe", "[<0-9> <r> <g> <b> <w>]",
+    {"globe", "[<0-9> " COLOR_HINT "]",
      "List the globe colours, or set one (0 = Sun ... 9 = Pluto); 'save' "
      "keeps it",
      cmd_globe},
     {"count", "<1-" STR(CONFIG_BSP_LED_MAX) ">",
      "LEDs on the chain, 7 per globe; 'save' keeps it", cmd_count},
+#endif
     {"budget", "<mA>",
      "LED current budget incl. idle current; 'save' keeps it", cmd_budget},
-    {"save", NULL, "Save globe colours, LED count and budget to flash",
-     cmd_save},
-    {"defaults", NULL,
-     "Restore built-in colours, LED count and budget (not saved)",
+    {"save", NULL, "Save " SAVED_SETTINGS " to flash", cmd_save},
+    {"defaults", NULL, "Restore built-in " SAVED_SETTINGS " (not saved)",
      cmd_defaults},
     {"watch", "[<seconds>]", "Print the LED current every 250 ms (default 10 s)",
      cmd_watch},
     {"leds", NULL, "List every LED's stored and sent values", cmd_leds},
-    {"rgbw", "<r> <g> <b> <w>",
+    {FILL_COMMAND, COLOR_HINT,
      "Debug: set all LEDs raw (manual mode, power on)", cmd_rgbw},
-    {"pixel", "<index> <r> <g> <b> <w>",
+    {"pixel", "<index> " COLOR_HINT,
      "Debug: set one LED raw (manual mode, power on)", cmd_pixel},
     {"power", "on|off",
      "Debug: drive LED power directly (manual mode); 'on' clears a fault",

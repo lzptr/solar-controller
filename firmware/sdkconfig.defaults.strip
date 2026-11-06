@@ -1,0 +1,2 @@
+# RGB LED strip instead of the planet globes: idf.py --preset strip build
+CONFIG_LAMP_VARIANT_STRIP=y

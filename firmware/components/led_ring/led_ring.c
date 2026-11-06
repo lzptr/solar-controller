@@ -7,6 +7,14 @@
 #include "led_strip.h"
 #include "sdkconfig.h"
 
+#if CONFIG_LAMP_VARIANT_STRIP
+#define LED_MODEL LED_MODEL_WS2812
+#define LED_FORMAT LED_STRIP_COLOR_COMPONENT_FMT_GRB
+#else
+#define LED_MODEL LED_MODEL_SK6812
+#define LED_FORMAT LED_STRIP_COLOR_COMPONENT_FMT_GRBW
+#endif
+
 static const char *TAG = "led_ring";
 
 static led_strip_handle_t strip;
@@ -29,6 +37,15 @@ static led_ring_rgbw_t scale_color(led_ring_rgbw_t color, uint16_t permille) {
       .b = scale_channel(color.b, permille),
       .w = scale_channel(color.w, permille),
   };
+}
+
+// The strip has no white channel; dropping W here keeps it out of the frame
+// and the current estimate.
+static led_ring_rgbw_t stored_color(led_ring_rgbw_t color) {
+#if CONFIG_LAMP_VARIANT_STRIP
+  color.w = 0;
+#endif
+  return color;
 }
 
 static uint64_t idle_ua(void) {
@@ -59,8 +76,8 @@ esp_err_t led_ring_init(void) {
   const led_strip_config_t strip_config = {
       .strip_gpio_num = BOARD_GPIO_LED_DATA,
       .max_leds = max_count,
-      .led_model = LED_MODEL_SK6812,
-      .color_component_format = LED_STRIP_COLOR_COMPONENT_FMT_GRBW,
+      .led_model = LED_MODEL,
+      .color_component_format = LED_FORMAT,
   };
   const led_strip_rmt_config_t rmt_config = {
       .clk_src = RMT_CLK_SRC_DEFAULT,
@@ -72,7 +89,7 @@ esp_err_t led_ring_init(void) {
     free(pixels);
     pixels = NULL;
     strip = NULL;
-    ESP_LOGE(TAG, "create SK6812 RMT device: %s", esp_err_to_name(error));
+    ESP_LOGE(TAG, "create LED RMT device: %s", esp_err_to_name(error));
     return error;
   }
   return ESP_OK;
@@ -93,13 +110,13 @@ esp_err_t led_ring_set_count(size_t new_count) {
 esp_err_t led_ring_set_pixel(size_t index, led_ring_rgbw_t color) {
   ESP_RETURN_ON_FALSE(index < count, ESP_ERR_INVALID_ARG, TAG,
                       "LED %u out of range", (unsigned)index);
-  pixels[index] = color;
+  pixels[index] = stored_color(color);
   return ESP_OK;
 }
 
 void led_ring_fill(led_ring_rgbw_t color) {
   for (size_t i = 0; i < count; i++) {
-    pixels[i] = color;
+    pixels[i] = stored_color(color);
   }
 }
 
@@ -133,9 +150,13 @@ esp_err_t led_ring_show(void) {
   for (size_t i = 0; i < max_count; i++) {
     const led_ring_rgbw_t out =
         i < count ? scale_color(pixels[i], scale) : (led_ring_rgbw_t){0};
-    ESP_RETURN_ON_ERROR(
-        led_strip_set_pixel_rgbw(strip, i, out.r, out.g, out.b, out.w), TAG,
-        "set LED %u", (unsigned)i);
+#if CONFIG_LAMP_VARIANT_STRIP
+    const esp_err_t error = led_strip_set_pixel(strip, i, out.r, out.g, out.b);
+#else
+    const esp_err_t error =
+        led_strip_set_pixel_rgbw(strip, i, out.r, out.g, out.b, out.w);
+#endif
+    ESP_RETURN_ON_ERROR(error, TAG, "set LED %u", (unsigned)i);
   }
   ESP_RETURN_ON_ERROR(led_strip_refresh(strip), TAG, "refresh LEDs");
   return ESP_OK;

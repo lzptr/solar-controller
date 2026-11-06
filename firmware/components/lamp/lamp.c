@@ -33,6 +33,18 @@
 
 static const char *TAG = "lamp";
 
+#if CONFIG_LAMP_VARIANT_STRIP
+
+// Warm white mixed from red, green and blue; a starting point for tuning on
+// the real strip with 'white'.
+static const led_ring_rgbw_t DEFAULT_WHITE = {255, 140, 40, 0};
+
+// The mode the knob and the button switch on to.
+#define MODE_ON LAMP_MODE_WHITE
+#define NVS_CONFIG_KEY "strip"
+
+#else
+
 static const char *const GLOBE_NAMES[LAMP_GLOBE_COUNT] = {
     "Sun",     "Mercury", "Venus",  "Earth",   "Mars",
     "Jupiter", "Saturn",  "Uranus", "Neptune", "Pluto",
@@ -56,6 +68,11 @@ static const led_ring_rgbw_t DEFAULT_GLOBES[LAMP_GLOBE_COUNT] = {
 // only ever changes the one globe it names.
 static const led_ring_rgbw_t WARM_WHITE = {255, 110, 0, 60};
 
+#define MODE_ON LAMP_MODE_COLOUR
+#define NVS_CONFIG_KEY "config"
+
+#endif
+
 typedef enum { POWER_OFF, POWER_RAMPING, POWER_ON } power_state_t;
 
 // NVS blobs; bump the version when the layout changes.
@@ -65,6 +82,16 @@ typedef struct {
   uint16_t brightness; // permille of full
 } saved_state_t;
 
+#if CONFIG_LAMP_VARIANT_STRIP
+// Under its own key, so the globe settings survive flashing the strip
+// firmware and back.
+typedef struct {
+  uint8_t version;
+  uint8_t led_count;
+  uint16_t budget_ma;
+  led_ring_rgbw_t white;
+} saved_config_t;
+#else
 typedef struct {
   uint8_t version;
   uint8_t led_count;
@@ -80,6 +107,7 @@ typedef struct {
   led_ring_rgbw_t white;
   led_ring_rgbw_t globes[LAMP_GLOBE_COUNT];
 } saved_config_v1_t;
+#endif
 
 static SemaphoreHandle_t lock;
 static nvs_handle_t nvs;
@@ -148,14 +176,21 @@ static led_ring_rgbw_t scale_color(led_ring_rgbw_t color, uint16_t permille) {
   };
 }
 
+static led_ring_rgbw_t scene_color(size_t led) {
+#if CONFIG_LAMP_VARIANT_STRIP
+  (void)led;
+  return config.white;
+#else
+  return state.mode == LAMP_MODE_WHITE
+             ? WARM_WHITE
+             : config.globes[(led / LAMP_LEDS_PER_GLOBE) % LAMP_GLOBE_COUNT];
+#endif
+}
+
 static void build_scene(void) {
   const uint16_t permille = state.brightness;
   for (size_t i = 0; i < led_ring_count(); i++) {
-    const led_ring_rgbw_t base =
-        state.mode == LAMP_MODE_WHITE
-            ? WARM_WHITE
-            : config.globes[(i / LAMP_LEDS_PER_GLOBE) % LAMP_GLOBE_COUNT];
-    led_ring_set_pixel(i, scale_color(base, permille));
+    led_ring_set_pixel(i, scale_color(scene_color(i), permille));
   }
 }
 
@@ -237,7 +272,7 @@ static void handle_input(encoder_event_t event) {
   if (event.steps != 0) {
     if (state.mode == LAMP_MODE_OFF) {
       // Turning the knob wakes the lamp.
-      state.mode = LAMP_MODE_COLOUR;
+      state.mode = MODE_ON;
       mark_state_dirty();
     }
     const uint16_t brightness = step_brightness(state.brightness, event.steps);
@@ -249,10 +284,17 @@ static void handle_input(encoder_event_t event) {
              state.brightness / 10, state.brightness % 10);
   }
   if (event.pressed) {
+#if CONFIG_LAMP_VARIANT_STRIP
+    // On <-> off. Turned down to 0 counts as off, so one press always
+    // changes what the strip shows.
+    const bool lit = state.mode != LAMP_MODE_OFF && state.brightness > 0;
+    state.mode = lit ? LAMP_MODE_OFF : LAMP_MODE_WHITE;
+#else
     // Colour -> white -> off -> colour.
     state.mode = state.mode == LAMP_MODE_COLOUR  ? LAMP_MODE_WHITE
                  : state.mode == LAMP_MODE_WHITE ? LAMP_MODE_OFF
                                                  : LAMP_MODE_COLOUR;
+#endif
     if (state.mode != LAMP_MODE_OFF && state.brightness == 0) {
       // Turned down to 0 with the knob: come back at the lowest step.
       state.brightness = encoder_steps[0];
@@ -297,11 +339,9 @@ static void measure(void) {
   }
 }
 
+// Dark in normal operation; blinks while a fault is latched.
 static void update_status_led(int64_t now) {
-  bool on = power != POWER_OFF;
-  if (fault != LAMP_FAULT_NONE) {
-    on = (now / FAULT_BLINK_MS) % 2 == 0;
-  }
+  const bool on = fault != LAMP_FAULT_NONE && (now / FAULT_BLINK_MS) % 2 == 0;
   gpio_set_level(BOARD_GPIO_STATUS_LED, on);
 }
 
@@ -347,9 +387,13 @@ static void default_config(void) {
                        ? CONFIG_LAMP_DEFAULT_BUDGET_MA
                        : budget_max_ma(),
   };
+#if CONFIG_LAMP_VARIANT_STRIP
+  config.white = DEFAULT_WHITE;
+#else
   for (size_t i = 0; i < LAMP_GLOBE_COUNT; i++) {
     config.globes[i] = DEFAULT_GLOBES[i];
   }
+#endif
 }
 
 static bool load_blob(const char *key, void *blob, size_t size) {
@@ -357,14 +401,20 @@ static bool load_blob(const char *key, void *blob, size_t size) {
   return nvs_get_blob(nvs, key, blob, &stored) == ESP_OK && stored == size;
 }
 
+#if CONFIG_LAMP_VARIANT_STRIP
+static bool load_config(void) {
+  return load_blob(NVS_CONFIG_KEY, &config, sizeof(config)) &&
+         config.version == CONFIG_VERSION;
+}
+#else
 // Read the saved config, carrying a version 1 blob over without its white
 // mix. The migrated config is written on the next 'save'.
 static bool load_config(void) {
-  if (load_blob("config", &config, sizeof(config))) {
+  if (load_blob(NVS_CONFIG_KEY, &config, sizeof(config))) {
     return config.version == CONFIG_VERSION;
   }
   saved_config_v1_t old;
-  if (!load_blob("config", &old, sizeof(old)) || old.version != 1) {
+  if (!load_blob(NVS_CONFIG_KEY, &old, sizeof(old)) || old.version != 1) {
     return false;
   }
   config = (saved_config_t){
@@ -374,6 +424,15 @@ static bool load_config(void) {
   };
   memcpy(config.globes, old.globes, sizeof(config.globes));
   return true;
+}
+#endif
+
+static bool mode_valid(lamp_mode_t mode) {
+#if CONFIG_LAMP_VARIANT_STRIP
+  return mode == LAMP_MODE_WHITE || mode == LAMP_MODE_OFF;
+#else
+  return mode <= LAMP_MODE_OFF;
+#endif
 }
 
 static void load_settings(void) {
@@ -385,8 +444,8 @@ static void load_settings(void) {
   }
   if (!load_blob("state", &state, sizeof(state)) ||
       state.version != STATE_VERSION || state.brightness > 1000 ||
-      state.mode > LAMP_MODE_OFF) {
-    state = (saved_state_t){.version = STATE_VERSION};
+      !mode_valid(state.mode)) {
+    state = (saved_state_t){.version = STATE_VERSION, .mode = MODE_ON};
   }
 }
 
@@ -463,6 +522,14 @@ const char *lamp_fault_name(lamp_fault_t reason) {
 
 uint32_t lamp_budget_max_ma(void) { return budget_max_ma(); }
 
+#if CONFIG_LAMP_VARIANT_STRIP
+led_ring_rgbw_t lamp_white(void) {
+  xSemaphoreTake(lock, portMAX_DELAY);
+  const led_ring_rgbw_t color = config.white;
+  xSemaphoreGive(lock);
+  return color;
+}
+#else
 const char *lamp_globe_name(size_t globe) {
   return globe < LAMP_GLOBE_COUNT ? GLOBE_NAMES[globe] : "?";
 }
@@ -474,13 +541,18 @@ led_ring_rgbw_t lamp_globe_color(size_t globe) {
   xSemaphoreGive(lock);
   return color;
 }
+#endif
 
 const char *lamp_mode_name(lamp_mode_t mode) {
   switch (mode) {
   case LAMP_MODE_COLOUR:
     return "colour";
   case LAMP_MODE_WHITE:
+#if CONFIG_LAMP_VARIANT_STRIP
+    return "on";
+#else
     return "white";
+#endif
   case LAMP_MODE_OFF:
     return "off";
   }
@@ -512,7 +584,7 @@ esp_err_t lamp_set_brightness(uint16_t permille) {
 }
 
 esp_err_t lamp_set_mode(lamp_mode_t mode) {
-  ESP_RETURN_ON_FALSE(mode <= LAMP_MODE_OFF, ESP_ERR_INVALID_ARG, TAG,
+  ESP_RETURN_ON_FALSE(mode_valid(mode), ESP_ERR_INVALID_ARG, TAG,
                       "invalid mode");
   xSemaphoreTake(lock, portMAX_DELAY);
   manual = false;
@@ -523,6 +595,17 @@ esp_err_t lamp_set_mode(lamp_mode_t mode) {
   return ESP_OK;
 }
 
+#if CONFIG_LAMP_VARIANT_STRIP
+esp_err_t lamp_set_white(led_ring_rgbw_t color) {
+  color.w = 0;
+  xSemaphoreTake(lock, portMAX_DELAY);
+  manual = false;
+  config.white = color;
+  update();
+  xSemaphoreGive(lock);
+  return ESP_OK;
+}
+#else
 esp_err_t lamp_set_globe_color(size_t globe, led_ring_rgbw_t color) {
   ESP_RETURN_ON_FALSE(globe < LAMP_GLOBE_COUNT, ESP_ERR_INVALID_ARG, TAG,
                       "globe %u out of range", (unsigned)globe);
@@ -533,6 +616,7 @@ esp_err_t lamp_set_globe_color(size_t globe, led_ring_rgbw_t color) {
   xSemaphoreGive(lock);
   return ESP_OK;
 }
+#endif
 
 esp_err_t lamp_set_led_count(size_t count) {
   xSemaphoreTake(lock, portMAX_DELAY);
@@ -560,7 +644,8 @@ esp_err_t lamp_set_budget_ma(uint32_t budget_ma) {
 
 esp_err_t lamp_save_config(void) {
   xSemaphoreTake(lock, portMAX_DELAY);
-  esp_err_t error = nvs_set_blob(nvs, "config", &config, sizeof(config));
+  esp_err_t error =
+      nvs_set_blob(nvs, NVS_CONFIG_KEY, &config, sizeof(config));
   if (error == ESP_OK) {
     error = nvs_commit(nvs);
   }

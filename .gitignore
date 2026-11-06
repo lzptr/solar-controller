@@ -33,6 +33,7 @@ log/
 
 # ESP-IDF generated files
 firmware/build/
+firmware/build-strip/
 firmware/test/build/
 firmware/sdkconfig
 firmware/sdkconfig.old

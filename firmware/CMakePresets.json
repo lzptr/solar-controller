@@ -1,0 +1,21 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "default",
+            "displayName": "Planet globes",
+            "description": "Ten globes with SK6812 RGBW rings",
+            "binaryDir": "build"
+        },
+        {
+            "name": "strip",
+            "displayName": "LED strip",
+            "description": "WS2812B RGB strip in warm white",
+            "binaryDir": "build-strip",
+            "cacheVariables": {
+                "SDKCONFIG_DEFAULTS": "sdkconfig.defaults;sdkconfig.defaults.strip",
+                "SDKCONFIG": "./build-strip/sdkconfig"
+            }
+        }
+    ]
+}

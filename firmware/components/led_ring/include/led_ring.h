@@ -18,9 +18,10 @@ typedef struct {
 } led_ring_rgbw_t;
 
 /**
- * Frame buffer for the SK6812 RGBW chain with a current limiter. Setters only
- * change the buffer; led_ring_show() sends it. Nothing here is thread-safe;
- * call it from one task.
+ * Frame buffer for the LED chain with a current limiter: SK6812 RGBW rings,
+ * or a WS2812B RGB strip with CONFIG_LAMP_VARIANT_STRIP, where W is dropped.
+ * Setters only change the buffer; led_ring_show() sends it. Nothing here is
+ * thread-safe; call it from one task.
  *
  * The limiter estimates the chain current from the channel values and scales
  * the whole frame down to fit the budget, then by the guard factor on top.

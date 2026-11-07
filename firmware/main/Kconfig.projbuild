@@ -1,5 +1,25 @@
 menu "Solar Controller"
 
+    choice LAMP_VARIANT
+        prompt "Lamp"
+        default LAMP_VARIANT_GLOBES
+        help
+            What hangs on the LED connector. 'idf.py --preset strip' selects
+            the strip through sdkconfig.defaults.strip.
+
+        config LAMP_VARIANT_GLOBES
+            bool "Planet globes (SK6812 RGBW rings)"
+            help
+                Ten globes in their own colours; the button cycles colour,
+                warm white and off.
+
+        config LAMP_VARIANT_STRIP
+            bool "LED strip (WS2812B RGB)"
+            help
+                One warm white mixed from red, green and blue; the button
+                switches the strip on and off.
+    endchoice
+
     # Keep fragments below component roots to avoid automatic duplicate inclusion.
     rsource "../components/bsp/config/Kconfig"
     rsource "../components/led_ring/config/Kconfig"

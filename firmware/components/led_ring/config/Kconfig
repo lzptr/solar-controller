@@ -1,7 +1,7 @@
 menu "LED ring"
 
 config LED_RING_CHANNEL_FULL_UA
-    int "Current of one SK6812 colour channel at 255 (uA)"
+    int "Current of one LED colour channel at 255 (uA)"
     range 1000 30000
     default 16000
     help
@@ -9,7 +9,7 @@ config LED_RING_CHANNEL_FULL_UA
         side; the measured-current guard corrects an underestimate.
 
 config LED_RING_IDLE_UA
-    int "Idle current of one SK6812 (uA)"
+    int "Idle current of one LED (uA)"
     range 0 5000
     default 1000
 
